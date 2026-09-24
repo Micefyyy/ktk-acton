@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kids Teaching Kids</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <nav>
+    <div class="nav-brand" onclick="showPage('home')">
+      <div class="nav-circle">K</div>
+      <div class="nav-brand-text">Kids Teaching <span>Kids</span></div>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('courses')">Courses</a>
+      <a onclick="showPage('about')">About Us</a>
+      <a onclick="showPage('history')">Our History</a>
+      <a onclick="showPage('staff')">Staff</a>
+      <a onclick="showPage('joinclass')">Join Class</a>
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLSc3uQJE6gYcZKurAlEyoNaD4GSxCNq9xm81yJtp_flL2gaFaw/viewform?usp=header" target="_blank">Join KTK</a>
+      <a onclick="showPage('signup')" class="nav-enroll">Teacher Login</a>
+    </div>
+    <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-particles">
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+        <div class="particle"></div><div class="particle"></div><div class="particle"></div>
+      </div>
+      <div class="dot-field-wrap" id="heroDotField"></div>
+      <div class="hero-inner">
+        <div class="hero-badge gradient-border gradient-border-fast">Free &middot; Online &middot; Student-Run</div>
+        <h1>KIDS<br><em>Teaching</em><br>KIDS</h1>
+        <p class="hero-sub">A student-led nonprofit offering free online courses for elementary and middle school students taught by passionate student volunteers.</p>
+        <div class="hero-btns">
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLSc3uQJE6gYcZKurAlEyoNaD4GSxCNq9xm81yJtp_flL2gaFaw/viewform?usp=header" target="_blank" class="btn-white btn-magnetic btn-pulse">Sign Up for Updates</a>
+          <span class="btn-ghost btn-magnetic" onclick="showPage('about')">Learn More &rarr;</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <span class="marquee-item"><span class="mi-dot"></span>Math</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Science</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Writing</span>
+        <span class="marquee-item"><span class="mi-dot"></span>History</span>
+        <span class="marquee-item"><span class="mi-dot"></span>English</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Biology</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Spanish</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Entrepreneurship</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Math</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Science</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Writing</span>
+        <span class="marquee-item"><span class="mi-dot"></span>History</span>
+        <span class="marquee-item"><span class="mi-dot"></span>English</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Biology</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Spanish</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Entrepreneurship</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Math</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Science</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Writing</span>
+        <span class="marquee-item"><span class="mi-dot"></span>History</span>
+        <span class="marquee-item"><span class="mi-dot"></span>English</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Biology</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Spanish</span>
+        <span class="marquee-item"><span class="mi-dot"></span>Entrepreneurship</span>
+      </div>
+    </div>
+
+    <section class="section" style="background:white;">
+      <div class="section-inner section-center">
+        <span class="eyebrow blur-text">Our Mission</span>
+        <h2 class="stitle blur-text">What is Kids Teaching Kids?</h2>
+        <p class="slead">We are a student-run nonprofit that hosts free online courses throughout the year for elementary and middle school students. Our community-based approach covers English, science, history, math and more. We believe in creating a strong academic base and introducing supplemental lessons in an engaging way.</p>
+        <span class="btn-outline" onclick="showPage('about')">Read More About Us</span>
+      </div>
+    </section>
+
+    <section class="section" style="background:var(--off);">
+      <div class="section-inner section-center">
+        <span class="eyebrow blur-text">How It Works</span>
+        <h2 class="stitle blur-text">3 Simple Steps</h2>
+        <div class="how-grid">
+          <div class="how-card reveal gradient-border gradient-border-green">
+            <div class="how-icon">1</div>
+            <h3>Sign Up as a Student</h3>
+            <p>Fill out our quick Google Form with your child's name, grade, and the course they'd like to join.</p>
+          </div>
+          <div class="how-card reveal reveal-delay-1 gradient-border gradient-border-blue">
+            <div class="how-icon g">2</div>
+            <h3>Join Your Class Online</h3>
+            <p>You'll receive a link by email. Click it at the scheduled time from any device &mdash; easy!</p>
+          </div>
+          <div class="how-card reveal reveal-delay-2 gradient-border gradient-border-coral">
+            <div class="how-icon y">3</div>
+            <h3>Learn!</h3>
+            <p>Enjoy fun, engaging sessions with friendly student teachers who genuinely care about your growth.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background:var(--blue);padding:48px 24px;">
+      <div class="section-inner section-center">
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-num" data-target="500">0</div>
+            <div class="stat-label">Students Taught</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" data-target="40">0</div>
+            <div class="stat-label">Student Teachers</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" data-target="15">0</div>
+            <div class="stat-label">Courses Offered</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" data-target="6">0</div>
+            <div class="stat-label">Years Running</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background:white;">
+      <div class="section-inner">
+        <div class="section-center" style="margin-bottom:0;">
+          <span class="eyebrow blur-text">Testimonials</span>
+          <h2 class="stitle blur-text">What Families Are Saying</h2>
+        </div>
+        <div class="quotes-grid reveal">
+          <div class="quotes-col">
+            <h3>Parents Say</h3>
+            <div class="quote-stack">
+              <div class="q"><div class="q-text">"Great program."</div><div class="q-by">Maple</div></div>
+              <div class="q"><div class="q-text">"The teachers explain concepts clearly."</div><div class="q-by">Yachao</div></div>
+              <div class="q"><div class="q-text">"I like how KTK offers a variety of courses."</div><div class="q-by">Yun</div></div>
+              <div class="q"><div class="q-text">"Great at teaching and explaining!"</div><div class="q-by">Shailee</div></div>
+              <div class="q"><div class="q-text">"The teacher engaged students in class and provided good feedback on writing assignments."</div><div class="q-by">Xuan</div></div>
+            </div>
+          </div>
+          <div class="quotes-col">
+            <h3>Students Say</h3>
+            <div class="quote-stack">
+              <div class="q gr"><div class="q-text">"I liked math and writing best. My favorite part is answering questions in class."</div><div class="q-by">Anonymous</div></div>
+              <div class="q gr"><div class="q-text">"I liked learning science a lot."</div><div class="q-by">Anonymous</div></div>
+              <div class="q gr"><div class="q-text">"The lessons are easy to understand."</div><div class="q-by">Anonymous</div></div>
+              <div class="q gr"><div class="q-text">"I liked typing a story about my figure skating experience and sharing it with my teacher."</div><div class="q-by">Eleanor</div></div>
+              <div class="q gr"><div class="q-text">"I enjoyed the classes."</div><div class="q-by">Misha</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="contact-band">
+      <h2>Contact Us</h2>
+      <p>Have questions about our courses? Interested in volunteering? We'd love to hear from you.</p>
+      <a href="mailto:ktkacton@gmail.com" class="email-a">ktkacton@gmail.com</a>
+      <div class="socials">
+        <a href="https://www.facebook.com/groups/431314825265364/" target="_blank" class="social-pill">Facebook</a>
+        <a href="http://youtube.com/channel/UCNuIQ_j2DDlwjOzOw4ySuvg" target="_blank" class="social-pill">YouTube</a>
+        <a href="mailto:ktkacton@gmail.com" class="social-pill">Email Us</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-courses">
+    <section class="section">
+      <div class="section-inner courses-inner">
+        <span class="eyebrow blur-text">Now Enrolling</span>
+        <h2 class="stitle blur-text">Available Courses</h2>
+        <p class="slead">Free online classes for K-8 students, held live on our platform. All of our courses are free. Pick a course below and sign up today!</p>
+
+        <div id="signup-form-card" class="signup-card gradient-border">
+          <h3 class="signup-title">Sign Up for a Course</h3>
+          <p class="signup-sub">Free online classes for K-8 students. Takes less than 2 minutes. You will receive a confirmation email with details and schedule.</p>
+
+          <label class="su-label">Parent / Guardian Name</label>
+          <input id="su-parent" class="su-input" type="text" placeholder="Jane Smith">
+
+          <label class="su-label">Email Address</label>
+          <input id="su-email" class="su-input" type="email" placeholder="jane@email.com">
+
+          <label class="su-label">Child's Full Name</label>
+          <input id="su-child" class="su-input" type="text" placeholder="Alex">
+
+          <label class="su-label">Child's Grade</label>
+          <select id="su-grade" class="su-input">
+            <option value="">Select grade...</option>
+            <option>K</option><option>1</option><option>2</option><option>3</option>
+            <option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+          </select>
+
+          <label class="su-label">Course Interested In</label>
+          <select id="su-course" class="su-input">
+            <option value="">Select a course...</option>
+            <option>Beginner AMC 8 Prep</option>
+            <option>Math Fundamentals</option>
+            <option>Geometry</option>
+            <option>Pre-Algebra</option>
+            <option>Spanish Fundamentals</option>
+            <option>Entrepreneurship 101</option>
+          </select>
+
+          <p class="su-note">All courses are held in the Eastern Time Zone.</p>
+
+          <label class="su-label">Anything Else? (optional)</label>
+          <textarea id="su-notes" class="su-input su-textarea" placeholder="Questions or accommodations..."></textarea>
+
+          <button class="btn-blue" onclick="submitSignup()" style="width:100%;margin-top:4px;">Sign My Child Up!</button>
+          <p class="su-footer-note">We will send a confirmation email within 24 hours with your class details.</p>
+        </div>
+
+        <div id="signup-success" style="display:none;text-align:center;padding:48px 20px;">
+          <h2 style="font-family:'Lora',serif;font-size:1.8rem;margin-bottom:8px;">We will see you in class!</h2>
+          <p style="color:var(--lighter);font-size:1rem;">A confirmation email has been sent. Check your inbox for class details and schedule.</p>
+          <button class="btn-blue" style="margin-top:16px;" onclick="resetSignup()">Sign Up Another Child</button>
+        </div>
+
+        <div id="courses-grid" class="courses-grid"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="page" id="page-about">
+    <section class="section">
+      <div class="section-inner section-center">
+        <span class="eyebrow blur-text">About Us</span>
+        <h2 class="stitle blur-text">Who We Are</h2>
+        <p class="slead">Kids Teaching Kids is a student-run nonprofit founded in 2020. We provide free online courses to elementary and middle school students, taught by passionate student volunteers from local high schools.</p>
+        <p class="slead">Our mission is to create a strong academic base and introduce supplemental lessons in an engaging way. Every course is designed to be fun, interactive, and accessible to all students regardless of background.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="page" id="page-history">
+    <section class="section">
+      <div class="section-inner section-center">
+        <span class="eyebrow blur-text">Our Story</span>
+        <h2 class="stitle blur-text">Our History</h2>
+        <p class="slead">Kids Teaching Kids started in 2020 when a group of high school students wanted to give back to their community during the pandemic. What began as a few informal tutoring sessions grew into a structured nonprofit with dozens of courses and hundreds of students.</p>
+        <p class="slead">Today, we run courses in math, science, writing, Spanish, and entrepreneurship &mdash; all taught by student volunteers who are passionate about education and community service.</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="page" id="page-staff">
+    <section class="section">
+      <div class="section-inner">
+        <span class="eyebrow blur-text">Our Team</span>
+        <h2 class="stitle blur-text">Staff</h2>
+        <div id="staff-grid" class="staff-grid"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="page" id="page-signup">
+    <section class="section">
+      <div class="section-inner section-center">
+        <span class="eyebrow blur-text">Welcome</span>
+        <h2 class="stitle blur-text">Teacher Login</h2>
+
+        <div id="tl-login" class="teacher-login-card gradient-border">
+          <label class="su-label">Name</label>
+          <input id="tl-name" class="su-input" type="text" placeholder="Your full name">
+
+          <label class="su-label">Teacher Code</label>
+          <input id="tl-code" class="su-input" type="text" placeholder="e.g. SJ2026">
+
+          <label class="su-label">Password</label>
+          <input id="tl-pass" class="su-input" type="password" placeholder="Your password">
+
+          <div id="tl-error" class="tl-error" style="display:none;"></div>
+          <button class="btn-blue" onclick="teacherCodeLogin()" style="width:100%;margin-top:8px;">Log In</button>
+        </div>
+
+        <div id="tl-dashboard" style="display:none;text-align:left;">
+          <h3 id="tl-welcome" style="font-family:'Lora',serif;font-size:1.5rem;margin-bottom:16px;"></h3>
+          <div id="tl-courses-list"></div>
+          <button class="btn-outline" onclick="teacherCodeLogout()" style="margin-top:16px;">Log Out</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="page" id="page-joinclass">
+    <section class="section">
+      <div class="section-inner section-center">
+        <span class="eyebrow blur-text">Join Class</span>
+        <h2 class="stitle blur-text">Enter Your Class Code</h2>
+        <p class="slead">Enter the class code you received via email to access your Zoom link.</p>
+        <input id="jc-code" class="su-input" type="text" placeholder="e.g. SJ2026" style="max-width:400px;text-align:center;font-size:1.2rem;">
+        <button class="btn-blue" onclick="joinClass()" style="margin-top:12px;">Join Class</button>
+        <div id="jc-result" style="margin-top:20px;"></div>
+      </div>
+    </section>
+  </div>
+
+  <canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
+
+  <button id="scrollTop" class="scroll-top-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">&uarr;</button>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-dot-field" id="footerDotField"></div>
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="nav-circle">K</div>
+          <div class="nav-brand-text">Kids Teaching <span>Kids</span></div>
+          <p class="footer-tagline">A student-run nonprofit &middot; Founded 2020</p>
+        </div>
+        <div class="footer-links">
+          <div class="flinks">
+            <a onclick="showPage('home')">Home</a>
+            <a onclick="showPage('courses')">Courses</a>
+            <a onclick="showPage('about')">About</a>
+            <a onclick="showPage('history')">History</a>
+            <a onclick="showPage('staff')">Staff</a>
+            <a onclick="showPage('joinclass')">Join Class</a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc3uQJE6gYcZKurAlEyoNaD4GSxCNq9xm81yJtp_flL2gaFaw/viewform?usp=header" target="_blank">Join Us</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <a href="mailto:ktkacton@gmail.com">ktkacton@gmail.com</a>
+        <p>&copy; 2026 KTK. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

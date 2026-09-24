@@ -1,0 +1,1905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <meta name="description" content="Kids Teaching Kids — a student-led nonprofit offering free online courses for elementary and middle school students. Sign up today!"/>
+<title>Kids Teaching Kids</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://meet.jit.si/external_api.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+ <style>
+ :root {
+  --white:#ffffff; --off:#f5f7fa; --border:#d0d8de;
+  --text:#1e293b; --soft:#475569; --lighter:#94a3b8;
+  --blue:#2aab82; --blue-dk:#1d8a67; --blue-lt:#e2f4ee;
+  --green:#22ad5c; --green-lt:#e2f7eb;
+ --yellow:#f5c842; --yellow-lt:#fdf6dc;
+ --coral:#e8604a; --coral-lt:#fdecea;
+ --purple:#8b6bb1; --purple-lt:#f0ebf8;
+ --radius:12px; --shadow:0 2px 16px rgba(0,0,0,0.07); --shadow-md:0 4px 28px rgba(0,0,0,0.10);
+ }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{font-family:'Josefin Sans',sans-serif;background:var(--white);color:var(--text);line-height:1.6;overflow-x:hidden;}
+
+  /* SCROLL PROGRESS BAR */
+  .scroll-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--green),var(--yellow),var(--coral));z-index:999;width:0%;transition:width 0.1s linear;}
+
+ /* NAV */
+ nav{position:sticky;top:0;z-index:200;background:var(--white);border-bottom:1.5px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:68px;}
+ .nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer;}
+ .nav-circle{width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-family:'Josefin Sans',sans-serif;font-weight:700;font-size:1.1rem;color:white;}
+ .nav-brand-text{font-family:'Josefin Sans',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text);}
+ .nav-brand-text span{color:var(--blue);}
+ .nav-links{display:flex;align-items:center;gap:4px;}
+ .nav-links a{font-size:0.9rem;font-weight:700;color:var(--soft);text-decoration:none;padding:7px 12px;border-radius:8px;transition:color 0.2s,background 0.2s;cursor:pointer;}
+ .nav-links a:hover{color:var(--blue);background:var(--blue-lt);}
+ .nav-enroll{background:var(--blue)!important;color:white!important;border-radius:50px!important;padding:8px 20px!important;font-weight:800!important;font-size:0.85rem!important;}
+ .nav-enroll:hover{background:var(--blue-dk)!important;}
+ .hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+ .hamburger span{width:22px;height:2px;background:var(--text);border-radius:2px;display:block;}
+
+ /* PAGES */
+ .page{display:none;} .page.active{display:block;}
+ @keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+ .page.active>*{animation:fadeUp 0.35s ease both;}
+
+ /* HERO */
+  .hero{background:var(--blue);color:white;text-align:center;padding:80px 24px 72px;position:relative;overflow:hidden;}
+  .hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%, rgba(255,255,255,0.08) 0%, transparent 60%);pointer-events:none;}
+  .hero-inner{max-width:660px;margin:0 auto;position:relative;z-index:2;}
+
+  /* ANIMATED HERO PARTICLES */
+  .hero-particles{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1;}
+  .hero-particles .particle{position:absolute;border-radius:50%;background:rgba(255,255,255,0.08);animation:float-particle linear infinite;}
+  .hero-particles .particle:nth-child(1){width:8px;height:8px;left:10%;top:20%;animation-duration:12s;}
+  .hero-particles .particle:nth-child(2){width:5px;height:5px;left:25%;top:70%;animation-duration:9s;animation-delay:-3s;}
+  .hero-particles .particle:nth-child(3){width:12px;height:12px;left:60%;top:15%;animation-duration:15s;animation-delay:-5s;}
+  .hero-particles .particle:nth-child(4){width:6px;height:6px;left:80%;top:60%;animation-duration:11s;animation-delay:-2s;}
+  .hero-particles .particle:nth-child(5){width:10px;height:10px;left:45%;top:80%;animation-duration:13s;animation-delay:-7s;}
+  .hero-particles .particle:nth-child(6){width:4px;height:4px;left:90%;top:30%;animation-duration:8s;animation-delay:-4s;}
+  .hero-particles .particle:nth-child(7){width:7px;height:7px;left:15%;top:50%;animation-duration:14s;animation-delay:-6s;}
+  .hero-particles .particle:nth-child(8){width:9px;height:9px;left:70%;top:45%;animation-duration:10s;animation-delay:-1s;}
+  .hero-particles .particle:nth-child(9){width:5px;height:5px;left:35%;top:10%;animation-duration:16s;animation-delay:-8s;}
+  .hero-particles .particle:nth-child(10){width:11px;height:11px;left:55%;top:55%;animation-duration:12s;animation-delay:-3s;}
+  .hero-particles .particle:nth-child(11){width:6px;height:6px;left:5%;top:85%;animation-duration:9s;animation-delay:-5s;}
+  .hero-particles .particle:nth-child(12){width:8px;height:8px;left:85%;top:75%;animation-duration:14s;animation-delay:-2s;}
+  @keyframes float-particle{0%{transform:translateY(0) translateX(0) scale(1);opacity:0;}20%{opacity:1;}80%{opacity:1;}100%{transform:translateY(-200px) translateX(60px) scale(0.5);opacity:0;}}
+
+  /* GRADIENT TEXT ANIMATION */
+  .hero h1{font-family:'Josefin Sans',sans-serif;font-size:clamp(2.4rem,7vw,3.8rem);font-weight:700;line-height:1.15;margin-bottom:20px;letter-spacing:2px;text-transform:uppercase;}
+  .hero h1 em{font-style:italic;background:linear-gradient(90deg,var(--yellow),#ffdd57,var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;background-size:200% auto;animation:shimmer-text 3s linear infinite;}
+  @keyframes shimmer-text{0%{background-position:0% center;}100%{background-position:200% center;}}
+
+  /* MAGNETIC BUTTON */
+  .btn-magnetic{position:relative;transition:transform 0.2s ease;}
+  .btn-magnetic:hover{transform:scale(1.03);}
+  .btn-magnetic:active{transform:scale(0.97);}
+
+  /* MARQUEE STRIP */
+  .marquee-wrap{overflow:hidden;background:var(--off);border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);padding:14px 0;position:relative;}
+  .marquee-track{display:flex;width:max-content;animation:marquee 20s linear infinite;}
+  .marquee-track:hover{animation-play-state:paused;}
+  .marquee-item{display:inline-flex;align-items:center;gap:8px;padding:0 28px;font-size:0.88rem;font-weight:700;color:var(--soft);white-space:nowrap;}
+  .marquee-item .mi-dot{width:6px;height:6px;border-radius:50%;background:#2aab82;flex-shrink:0;}.marquee-item:nth-child(3n+2) .mi-dot{background:#22c55e;}.marquee-item:nth-child(3n) .mi-dot{background:#16a34a;}
+  
+  
+  @keyframes marquee{0%{transform:translateX(0);}100%{transform:translateX(-33.333%);}}
+
+  /* ANIMATED GLOW BORDER CARDS */
+  .glow-card{position:relative;background:white;border-radius:var(--radius);overflow:hidden;}
+  .glow-card::before{content:'';position:absolute;inset:-2px;background:conic-gradient(from 0deg,var(--blue),var(--green),var(--yellow),var(--coral),var(--purple),var(--blue));border-radius:calc(var(--radius) + 2px);z-index:-1;opacity:0;animation:none;}
+  .glow-card:hover::before{opacity:1;animation:rotate-glow 3s linear infinite;}
+  @keyframes rotate-glow{0%{filter:hue-rotate(0deg);}100%{filter:hue-rotate(360deg);}}
+
+  /* SCROLL REVEAL */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease;}
+  .reveal.visible{opacity:1;transform:none;}
+  .reveal-delay-1{transition-delay:0.1s;}
+  .reveal-delay-2{transition-delay:0.2s;}
+  .reveal-delay-3{transition-delay:0.3s;}
+
+  /* 3D TILT CARDS */
+  .tilt-card{transition:transform 0.15s ease;transform-style:preserve-3d;perspective:1000px;}
+  .tilt-card:hover{box-shadow:var(--shadow-md);}
+
+  /* COUNTER STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin:40px 0;}
+  .stat-box{text-align:center;padding:20px 12px;}
+  .stat-num{font-family:'Josefin Sans',sans-serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:700;color:white;line-height:1.1;}
+  .stat-label{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.75);margin-top:4px;}
+
+  /* PULSING CTA */
+  .btn-pulse{animation:pulse-glow 2s ease-in-out infinite;}
+  @keyframes pulse-glow{0%,100%{box-shadow:0 4px 16px rgba(0,0,0,0.15);}50%{box-shadow:0 4px 28px rgba(42,171,130,0.45),0 0 60px rgba(42,171,130,0.15);}}
+
+  /* STICKY NAV BLUR */
+  nav{transition:background 0.3s,box-shadow 0.3s;}
+  nav.scrolled{background:rgba(255,255,255,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 2px 20px rgba(0,0,0,0.06);}
+
+  /* TYPING CURSOR */
+  .hero-sub::after{content:'|';animation:blink 1s step-end infinite;opacity:0.6;margin-left:2px;}
+  @keyframes blink{0%,100%{opacity:0.6;}50%{opacity:0;}}
+
+  /* GLOW QUOTE BORDERS */
+  .q{transition:border-left-color 0.3s,box-shadow 0.3s;}
+  .q:hover{box-shadow:0 4px 20px rgba(42,171,130,0.12);}
+  .q.gr:hover{box-shadow:0 4px 20px rgba(42,171,130,0.12);}
+
+  /* FLOATING EMOJI DECORATIONS */
+  .hero-inner::before{content:'';position:absolute;top:-30px;right:-40px;font-size:3rem;opacity:0.12;animation:float-emoji 6s ease-in-out infinite;pointer-events:none;z-index:0;}
+
+  /* ANIMATED SUBJECT PILLS */
+  .subj-pill{transition:transform 0.2s,box-shadow 0.2s;cursor:default;}
+  .subj-pill:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+
+  /* CARD STAGGER ENTRANCE */
+  @keyframes card-enter{from{opacity:0;transform:translateY(20px) scale(0.97);}to{opacity:1;transform:none;}}
+  .how-card{animation:card-enter 0.5s ease both;}
+  .how-card:nth-child(2){animation-delay:0.1s;}
+  .how-card:nth-child(3){animation-delay:0.2s;}
+
+  /* FOOTER LINK HOVER UNDERLINE */
+  .flinks a{position:relative;}
+  .flinks a::after{content:'';position:absolute;bottom:-2px;left:50%;width:0;height:1.5px;background:var(--yellow);transition:width 0.3s,left 0.3s;}
+  .flinks a:hover::after{width:100%;left:0;}
+
+  /* SOCIAL PILL GLOW */
+  .social-pill{transition:border-color 0.2s,color 0.2s,box-shadow 0.2s;}
+  .social-pill:hover{box-shadow:0 0 20px rgba(42,171,130,0.2);}
+
+  /* FEATURE CARD ICON BOUNCE */
+  .feat{transition:transform 0.2s,box-shadow 0.2s;}
+  .feat:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+
+  /* RIPPLE EFFECT ON BUTTONS */
+  .btn-sub,.btn-blue,.btn-white{position:relative;overflow:hidden;}
+  .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,0.3);transform:scale(0);animation:ripple-anim 0.6s linear;pointer-events:none;}
+  @keyframes ripple-anim{to{transform:scale(4);opacity:0;}}
+
+  /* DOT FIELD */
+  .dot-field-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
+  .dot-field-wrap canvas{position:absolute;top:0;left:0;}
+  .dot-field-wrap svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+
+  /* BLUR TEXT */
+  .blur-text-word{display:inline-block;will-change:transform,filter,opacity;}
+  .blur-text{gap:0.35em;justify-content:center;}
+
+  /* ANIMATED GRADIENT BORDER */
+  @keyframes gradient-rotate{from{--gradient-angle:0deg;}to{--gradient-angle:360deg;}}
+  @property --gradient-angle{syntax:'<angle>';initial-value:0deg;inherits:false;}
+  .gradient-border{position:relative;border-radius:16px;border:2.5px solid transparent;background-clip:padding-box,border-box;background-origin:padding-box,border-box;transition:transform 0.25s ease;}
+  .gradient-border::before{content:'';position:absolute;inset:-2.5px;border-radius:inherit;z-index:-1;background:conic-gradient(from var(--gradient-angle),#584827 0%,#c7a03c 37%,#f9de90 30%,#c7a03c 33%,#584827 40%,#584827 50%,#c7a03c 77%,#f9de90 80%,#c7a03c 83%,#584827 90%);animation:gradient-rotate 5s linear infinite;mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;}
+  .gradient-border:hover{transform:scale(1.015);}
+  .gradient-border-fast::before{animation-duration:0.8s;}
+  .gradient-border-green::before{background:conic-gradient(from var(--gradient-angle),#166534 0%,#22c55e 37%,#86efac 30%,#22c55e 33%,#166534 40%,#166534 50%,#22c55e 77%,#86efac 80%,#22c55e 83%,#166534 90%);animation:gradient-rotate 4s linear infinite;}
+  .gradient-border-blue::before{background:conic-gradient(from var(--gradient-angle),#1e3a5f 0%,#3b82f6 37%,#93c5fd 30%,#3b82f6 33%,#1e3a5f 40%,#1e3a5f 50%,#3b82f6 77%,#93c5fd 80%,#3b82f6 83%,#1e3a5f 90%);animation:gradient-rotate 4s linear infinite;}
+  .gradient-border-coral::before{background:conic-gradient(from var(--gradient-angle),#7c2d12 0%,#ea580c 37%,#fdba74 30%,#ea580c 33%,#7c2d12 40%,#7c2d12 50%,#ea580c 77%,#fdba74 80%,#ea580c 83%,#7c2d12 90%);animation:gradient-rotate 4s linear infinite;}
+  .gradient-border-purple::before{background:conic-gradient(from var(--gradient-angle),#581c87 0%,#7c3aed 37%,#c4b5fd 30%,#7c3aed 33%,#581c87 40%,#581c87 50%,#7c3aed 77%,#c4b5fd 80%,#7c3aed 83%,#581c87 90%);animation:gradient-rotate 4s linear infinite;}
+
+  .page{display:none;}
+  .page.active{display:block;}
+ .hero-badge{display:inline-block;background:rgba(255,255,255,0.18);color:white;font-size:0.76rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;padding:5px 16px;border-radius:50px;margin-bottom:28px;}
+
+ .hero-sub{font-size:1.08rem;opacity:0.9;max-width:500px;margin:0 auto 36px;line-height:1.72;}
+ .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+ .btn-white{background:white;color:var(--blue-dk);padding:13px 28px;border-radius:50px;font-weight:800;font-size:0.97rem;text-decoration:none;display:inline-block;box-shadow:0 4px 16px rgba(0,0,0,0.15);transition:transform 0.15s,box-shadow 0.15s;}
+ .btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+ .btn-ghost{background:transparent;color:white;border:2px solid rgba(255,255,255,0.65);padding:12px 26px;border-radius:50px;font-weight:700;font-size:0.97rem;text-decoration:none;display:inline-block;cursor:pointer;transition:background 0.2s;}
+ .btn-ghost:hover{background:rgba(255,255,255,0.15);}
+
+ /* SECTIONS */
+ .section{padding:72px 24px;}
+ .section-inner{max-width:900px;margin:0 auto;}
+  .section-inner.wide{max-width:1600px;}
+ .section-center{text-align:center;}
+ .eyebrow{font-size:0.74rem;font-weight:800;text-transform:uppercase;letter-spacing:3px;color:var(--blue);margin-bottom:10px;display:block;}
+ h2.stitle{font-family:'Josefin Sans',sans-serif;font-size:clamp(1.6rem,4vw,2.3rem);font-weight:700;line-height:1.3;margin-bottom:16px;letter-spacing:0.5px;}
+ .slead{font-size:1.02rem;color:var(--soft);line-height:1.75;max-width:600px;margin-bottom:44px;}
+ .section-center .slead{margin-left:auto;margin-right:auto;}
+ hr.div{border:none;border-top:1.5px solid var(--border);margin:56px 0;}
+
+ /* BUTTONS */
+ .btn-blue{background:var(--blue);color:white;padding:9px 20px;border-radius:50px;font-weight:800;font-size:0.82rem;text-decoration:none;display:inline-block;transition:background 0.2s;}
+ .btn-blue:hover{background:var(--blue-dk);}
+ .btn-outline{background:transparent;color:var(--blue);border:2px solid var(--blue);padding:10px 22px;border-radius:50px;font-weight:800;font-size:0.9rem;text-decoration:none;cursor:pointer;display:inline-block;transition:background 0.2s;}
+ .btn-outline:hover{background:var(--blue-lt);}
+
+ /* HOW IT WORKS */
+ .how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:44px;}
+ .how-card{text-align:center;padding:8px;}
+ .how-icon{width:60px;height:60px;border-radius:50%;background:var(--blue-lt);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;font-family:"Josefin Sans",sans-serif;font-size:1.4rem;font-weight:700;color:var(--blue);}
+ .how-icon.g{background:var(--green-lt);color:var(--green);}
+ .how-icon.y{background:var(--yellow-lt);color:#c48a00;}
+ .how-card h3{font-family:'Josefin Sans',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:8px;}
+ .how-card p{font-size:0.91rem;color:var(--soft);line-height:1.65;}
+
+ /* QUOTES */
+ .quotes-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;margin-top:44px;}
+ .quotes-col h3{font-family:'Josefin Sans',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:16px;}
+ .quote-stack{display:flex;flex-direction:column;gap:10px;}
+ .q{background:var(--off);border-left:3px solid var(--blue);border-radius:var(--radius);padding:14px 16px;}
+ .q.gr{border-left-color:var(--green);}
+ .q-text{font-size:0.91rem;font-style:italic;color:var(--text);line-height:1.58;margin-bottom:5px;}
+ .q-by{font-size:0.76rem;font-weight:800;color:var(--soft);}
+
+ /* CONTACT */
+ .contact-band{background:var(--off);border-top:1.5px solid var(--border);border-bottom:1.5px solid var(--border);padding:56px 24px;text-align:center;}
+ .contact-band h2{font-family:'Josefin Sans',sans-serif;font-size:2rem;font-weight:700;margin-bottom:8px;}
+ .contact-band p{color:var(--soft);font-size:0.97rem;margin-bottom:20px;}
+ .contact-band .email-a{font-size:1.1rem;font-weight:800;color:var(--blue);text-decoration:none;display:block;margin-bottom:24px;}
+ .contact-band .email-a:hover{text-decoration:underline;}
+ .socials{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+ .social-pill{display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:50px;border:1.5px solid var(--border);font-size:0.87rem;font-weight:700;color:var(--text);text-decoration:none;background:white;transition:border-color 0.2s,color 0.2s;}
+ .social-pill:hover{border-color:var(--blue);color:var(--blue);}
+
+ /* COURSES */
+ .alert{background:var(--yellow-lt);border:1.5px solid #ddc850;border-radius:var(--radius);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:36px;}
+ .alert p{font-size:0.93rem;font-weight:700;}
+ .alert p small{font-weight:400;color:var(--soft);}
+ .course-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:22px;}
+ .section-inner.courses-inner{max-width:1150px;}
+ .course-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;align-items:stretch;transition:box-shadow 0.2s,border-color 0.2s;}
+ .course-card:hover{box-shadow:var(--shadow-md);border-color:var(--blue);}
+ .subj-pill{display:inline-block;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:3px 12px;border-radius:50px;margin-bottom:8px;}
+ .sp-math{background:var(--blue-lt);color:var(--blue-dk);}
+ .sp-sci{background:var(--green-lt);color:#2d7a4f;}
+ .sp-write{background:var(--purple-lt);color:#5a3d8a;}
+ .sp-lang{background:#ffe4e6;color:#b91c1c;}
+ .sp-biz{background:#ccfbf1;color:#0f766e;}
+ .c-name{font-family:'Josefin Sans',sans-serif;font-size:1.25rem;font-weight:700;margin-bottom:4px;}
+ .c-tag{font-size:0.88rem;color:var(--soft);font-style:italic;margin-bottom:12px;}
+ .c-desc{font-size:0.88rem;color:var(--soft);line-height:1.55;margin-bottom:0;}
+ .c-meta{display:flex;flex-wrap:wrap;gap:10px;}
+ .c-meta-item{display:flex;align-items:center;gap:5px;font-size:0.83rem;font-weight:600;color:var(--text);}
+ .c-aside{display:flex;flex-direction:column;gap:10px;align-items:flex-end;min-width:130px;}
+ .free-tag{background:var(--green-lt);color:#2d7a4f;font-size:0.77rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:4px 12px;border-radius:50px;}
+ .coming{background:var(--off);border:1.5px dashed var(--border);border-radius:var(--radius);padding:26px;text-align:center;font-size:0.93rem;color:var(--soft);}
+ .info-banner{background:var(--blue-lt);border:1.5px solid #a8d8c8;border-radius:var(--radius);padding:22px 26px;margin-top:28px;}
+ .info-banner h3{font-family:'Josefin Sans',sans-serif;font-weight:700;margin-bottom:8px;}
+ .info-banner p{font-size:0.91rem;color:var(--soft);line-height:1.68;}
+
+ /* ABOUT */
+ .about-body{font-size:0.99rem;color:var(--soft);line-height:1.82;}
+ .about-body p+p{margin-top:16px;}
+ .about-body strong{color:var(--text);}
+ .about-sign{font-family:'Josefin Sans',sans-serif;font-size:1.05rem;font-style:italic;color:var(--blue-dk);margin-top:26px;}
+ .feats{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px;}
+ .feat{background:var(--off);border:1.5px solid var(--border);border-radius:var(--radius);padding:22px 18px;text-align:center;}
+ .feat-em{font-size:1.1rem;margin-bottom:8px;display:block;color:var(--blue);}
+ .feat h4{font-family:'Josefin Sans',sans-serif;font-size:0.97rem;font-weight:700;margin-bottom:5px;}
+ .feat p{font-size:0.83rem;color:var(--soft);line-height:1.5;}
+ .chinatown{background:var(--yellow-lt);border:1.5px solid #ddc850;border-radius:var(--radius);padding:28px 32px;margin-top:44px;}
+ .chinatown h3{font-family:'Josefin Sans',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:10px;}
+ .chinatown p{font-size:0.93rem;color:var(--soft);line-height:1.7;margin-bottom:12px;}
+
+ /* HISTORY */
+ .timeline{position:relative;padding-left:38px;max-width:680px;}
+ .timeline::before{content:'';position:absolute;left:16px;top:8px;bottom:8px;width:2px;background:var(--border);}
+ .tl-item{position:relative;margin-bottom:36px;}
+ .tl-dot{position:absolute;left:-30px;top:2px;width:26px;height:26px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:white;z-index:2;}
+ .tl-item:nth-child(2) .tl-dot{background:var(--green);}
+ .tl-item:nth-child(3) .tl-dot{background:var(--coral);}
+ .tl-item:nth-child(4) .tl-dot{background:var(--yellow);color:var(--text);}
+ .tl-yr{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:4px;}
+ .tl-item:nth-child(2) .tl-yr{color:var(--green);}
+ .tl-item:nth-child(3) .tl-yr{color:var(--coral);}
+ .tl-item:nth-child(4) .tl-yr{color:#c48a00;}
+ .tl-box{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);}
+ .tl-box h3{font-family:'Josefin Sans',sans-serif;font-size:1.02rem;font-weight:700;margin-bottom:5px;}
+ .tl-box p{font-size:0.88rem;color:var(--soft);line-height:1.62;}
+
+ /* STAFF */
+ .slabel{font-family:'Josefin Sans',sans-serif;font-size:1.45rem;font-weight:700;text-align:center;margin-bottom:4px;}
+ .ssub{text-align:center;color:var(--soft);font-size:0.9rem;margin-bottom:32px;}
+   .board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:36px;margin-bottom:60px;}
+   .fac-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:36px;}
+   .s-card{display:flex;flex-direction:column;background:white;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:box-shadow 0.2s,transform 0.2s;}
+   .s-card:hover{box-shadow:var(--shadow-md);transform:translateY(-3px);}
+   .s-ph{width:100%;height:220px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--blue-lt),#c0e8d8);overflow:hidden;flex-shrink:0;}
+    .s-ph img{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;}
+   .s-ph.gph{background:linear-gradient(135deg,var(--green-lt),#c5e8d0);}
+   .s-ph.cph{background:linear-gradient(135deg,var(--coral-lt),#f5cfc8);}
+   .s-ph.pph{background:linear-gradient(135deg,var(--purple-lt),#ddd1f0);}
+   .s-ph.yph{background:linear-gradient(135deg,var(--yellow-lt),#f5e7a0);}
+   .s-init{font-family:'Josefin Sans',sans-serif;font-size:3rem;font-weight:700;color:var(--blue);opacity:0.65;}
+   .s-ph.gph .s-init{color:var(--green);}
+   .s-ph.cph .s-init{color:var(--coral);}
+   .s-ph.pph .s-init{color:var(--purple);}
+   .s-ph.yph .s-init{color:#c48a00;}
+   .s-info{padding:28px 30px;flex:1;display:flex;flex-direction:column;}
+   .s-bio{flex:1;}
+   .s-role{font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--blue);margin-bottom:5px;}
+   .s-name{font-family:'Josefin Sans',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:8px;}
+   .s-bio{font-size:0.9rem;color:var(--soft);line-height:1.5;}
+
+ /* JOIN */
+ .join-top{background:var(--blue);color:white;border-radius:var(--radius);padding:38px 36px;text-align:center;margin-bottom:44px;}
+ .join-top h2{font-family:'Josefin Sans',sans-serif;font-size:1.75rem;font-weight:700;margin-bottom:10px;}
+ .join-top p{opacity:0.88;font-size:0.97rem;max-width:480px;margin:0 auto 22px;line-height:1.7;}
+ .roles{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:44px;}
+ .role-card{background:var(--off);border:1.5px solid var(--border);border-radius:var(--radius);padding:26px 24px;}
+ .role-card h3{font-family:'Josefin Sans',sans-serif;font-size:1.15rem;font-weight:700;margin-bottom:10px;}
+ .role-card p,.role-card li{font-size:0.91rem;color:var(--soft);line-height:1.7;}
+ .role-card ul{padding-left:16px;margin-top:6px;}
+ .role-card li{margin-bottom:4px;}
+ .why-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:44px;}
+ .why-card{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:20px 18px;text-align:center;}
+ .why-n{font-family:'Josefin Sans',sans-serif;font-size:1.9rem;font-weight:700;color:var(--blue);margin-bottom:4px;}
+ .why-card h4{font-weight:800;font-size:0.93rem;margin-bottom:5px;}
+ .why-card p{font-size:0.83rem;color:var(--soft);line-height:1.58;}
+ .add-info{background:var(--blue-lt);border:1.5px solid #a8d8c8;border-radius:var(--radius);padding:26px 30px;}
+ .add-info h3{font-family:'Josefin Sans',sans-serif;font-size:1.08rem;font-weight:700;margin-bottom:10px;}
+ .add-info p{font-size:0.91rem;color:var(--soft);line-height:1.7;margin-bottom:8px;}
+
+ /* SIGNUP */
+ .su-wrap{max-width:640px;margin:0 auto;}
+ .su-intro{text-align:center;margin-bottom:36px;}
+ .su-card{background:white;border:1.5px solid var(--border);border-radius:16px;padding:38px 38px;box-shadow:var(--shadow-md);}
+ .fg{margin-bottom:16px;}
+ label{display:block;font-size:0.8rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text);margin-bottom:5px;}
+ input,select,textarea{width:100%;padding:11px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'Josefin Sans',sans-serif;font-size:0.95rem;color:var(--text);background:white;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+ input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(42,171,130,0.15);}
+ .fr{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+ .btn-sub{width:100%;background:var(--blue);color:white;border:none;border-radius:50px;padding:13px;cursor:pointer;font-family:'Josefin Sans',sans-serif;font-size:0.97rem;font-weight:800;margin-top:6px;transition:background 0.2s,transform 0.15s;}
+ .btn-sub:hover{background:var(--blue-dk);transform:translateY(-1px);}
+ .fn{text-align:center;font-size:0.78rem;color:var(--lighter);margin-top:8px;}
+ #suc{display:none;background:var(--green-lt);border:1.5px solid var(--green);border-radius:var(--radius);padding:20px;text-align:center;font-weight:700;color:#2d7a4f;font-size:0.97rem;margin-top:14px;}
+
+ /* FOOTER */
+ footer{background:#153228;color:rgba(255,255,255,0.6);padding:40px 24px;text-align:center;}
+ .flogo{font-family:'Josefin Sans',sans-serif;font-size:1.3rem;font-weight:700;color:white;margin-bottom:6px;}
+ .flogo span{color:var(--yellow);}
+ footer p{font-size:0.84rem;line-height:1.7;}
+ .flinks{display:flex;justify-content:center;gap:18px;margin:14px 0;flex-wrap:wrap;}
+ .flinks a{color:rgba(255,255,255,0.55);text-decoration:none;font-size:0.84rem;font-weight:600;cursor:pointer;transition:color 0.2s;}
+ .flinks a:hover{color:var(--yellow);}
+ .fdiv{border:none;border-top:1px solid rgba(255,255,255,0.1);margin:18px auto;max-width:300px;}
+
+ /* RESPONSIVE */
+ @media(max-width:768px){
+ nav{padding:0 16px;}
+ .nav-links{display:none;flex-direction:column;position:fixed;top:68px;left:0;right:0;bottom:0;background:white;padding:18px 20px;gap:3px;overflow-y:auto;z-index:199;}
+ .nav-links.open{display:flex;}
+ .hamburger{display:flex;}
+ .hero{padding:52px 18px 44px;}
+  .how-grid,.feats,.why-row,.roles,.fr,.stats-row{grid-template-columns:1fr;}
+  .quotes-grid,.board-grid,.course-card,.course-list{grid-template-columns:1fr;}
+  .c-aside{flex-direction:row;align-items:center;}
+  .section{padding:50px 16px;}
+  .su-card{padding:26px 18px;}
+  }
+
+    .coming-soon-wrap{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;background:var(--off);border:1.5px solid var(--border);border-radius:var(--radius);padding:48px 44px;}
+    .csw-text h3{font-family:'Josefin Sans',sans-serif;font-size:1.35rem;font-weight:700;margin-bottom:12px;}
+    .csw-text p{font-size:0.97rem;color:var(--soft);line-height:1.72;margin-bottom:22px;}
+    .csw-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--lighter);margin-bottom:14px;display:block;}
+    .csw-pills{display:flex;flex-wrap:wrap;gap:8px;}
+    .sp-hist{background:#fef3e2;color:#9a6000;}
+    .sp-eng{background:var(--purple-lt);color:#5a3d8a;}
+    .sp-more{background:white;color:var(--lighter);border:1.5px solid var(--border);}
+ /* JOIN CLASS */
+ .jc-wrap{max-width:600px;margin:0 auto;}
+ .jc-toggle{text-align:center;font-size:0.85rem;margin-top:24px;color:var(--lighter);}
+ .jc-toggle a{color:var(--blue);font-weight:700;cursor:pointer;text-decoration:none;}
+ .jc-toggle a:hover{text-decoration:underline;}
+ /* Demo mode */
+ .jc-demo-bar{display:flex;align-items:center;gap:10px;background:var(--yellow-lt);border:1.5px solid #ddc850;border-radius:var(--radius);padding:10px 16px;margin-top:14px;font-size:0.84rem;}
+ .jc-demo-bar .jdb-icon{font-size:1.1rem;flex-shrink:0;}
+ .jc-demo-bar .jdb-text{flex:1;color:var(--text);line-height:1.5;}
+ .jc-demo-bar .jdb-text strong{font-weight:800;}
+ .jc-demo-btn{background:var(--yellow);color:#7a5400;border:none;border-radius:50px;padding:6px 16px;font-weight:800;font-size:0.78rem;cursor:pointer;white-space:nowrap;transition:background 0.2s;}
+ .jc-demo-btn:hover{background:#e6b92e;}
+ .jc-demo-active{background:var(--green-lt)!important;border-color:var(--green)!important;}
+ .jc-code-input{text-align:center;padding:30px 20px;}
+ .jc-code-input input{max-width:280px;font-size:1.5rem;text-align:center;letter-spacing:6px;text-transform:uppercase;font-weight:800;padding:14px 16px;border:2px solid var(--border);border-radius:12px;}
+ .jc-code-input input:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(42,171,130,0.15);}
+ .jc-code-input .btn-blue{font-size:1.05rem;padding:14px 36px;margin-top:14px;}
+ .jc-result{display:none;background:var(--green-lt);border:1.5px solid var(--green);border-radius:var(--radius);padding:28px 32px;margin-top:24px;}
+ .jc-result h3{font-family:'Josefin Sans',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:8px;color:var(--text);}
+ .jc-result p{font-size:0.93rem;color:var(--soft);line-height:1.7;}
+ .jc-result .jc-zoom-link{display:inline-block;margin-top:14px;background:var(--blue);color:white;padding:12px 24px;border-radius:50px;font-weight:800;font-size:0.95rem;text-decoration:none;}
+ .jc-result .jc-zoom-link:hover{background:var(--blue-dk);}
+ .jc-error{display:none;background:var(--coral-lt);border:1.5px solid var(--coral);border-radius:var(--radius);padding:16px 20px;margin-top:20px;color:var(--coral);font-weight:700;text-align:center;font-size:0.93rem;}
+ 
+ 
+ 
+ .jc-auth-forms{max-width:400px;margin:0 auto;}
+ .jc-auth-forms .fg input{font-size:0.95rem;}
+ .jc-auth-switch{text-align:center;font-size:0.85rem;color:var(--lighter);margin-top:12px;}
+ .jc-auth-switch a{color:var(--blue);font-weight:700;cursor:pointer;}
+ .jc-gen-code{display:none;}
+ .jc-gen-code .code-display{background:var(--off);border:1.5px dashed var(--border);border-radius:var(--radius);padding:20px;text-align:center;margin-top:16px;}
+ .jc-gen-code .code-display .big-code{font-family:monospace;font-size:2.2rem;font-weight:800;letter-spacing:8px;color:var(--blue);}
+ .jc-gen-code .code-display .copy-btn{display:inline-block;margin-top:10px;background:var(--blue);color:white;border:none;border-radius:50px;padding:8px 20px;font-weight:700;cursor:pointer;font-size:0.85rem;}
+ .jc-auth-error{display:none;background:var(--coral-lt);border:1.5px solid var(--coral);border-radius:var(--radius);padding:12px 16px;margin-top:12px;color:var(--coral);font-weight:700;font-size:0.88rem;text-align:center;}
+ .jc-teacher-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+ .jc-teacher-header h3{margin-bottom:0!important;}
+ .jc-logout-btn{background:none;border:1.5px solid var(--border);border-radius:50px;padding:6px 16px;font-size:0.82rem;font-weight:700;color:var(--soft);cursor:pointer;transition:border-color 0.2s;}
+ .jc-logout-btn:hover{border-color:var(--coral);color:var(--coral);}
+
+ /* ===== CLASSROOM ===== */
+ .cr-wrap{position:fixed;inset:0;top:68px;z-index:100;background:var(--text);}
+ .cr-header{display:flex;align-items:center;justify-content:space-between;padding:10px 20px;background:var(--text);color:white;}
+ .cr-header h3{font-family:'Josefin Sans',sans-serif;font-size:1rem;font-weight:700;}
+ .cr-leave-btn{background:var(--coral);color:white;border:none;border-radius:50px;padding:8px 20px;font-weight:700;font-size:0.85rem;cursor:pointer;transition:background 0.2s;}
+ .cr-leave-btn:hover{background:#c94a36;}
+ #jitsiContainer{width:100%;height:calc(100vh - 68px - 48px);position:relative;overflow:hidden;}
+ #jitsiContainer iframe{width:100%!important;height:100%!important;position:absolute!important;top:0!important;left:0!important;border:0!important;}
+ /* Force Jitsi's own layout to fill the frame */
+ #jitsiContainer .jitsi-meet{width:100%!important;height:100%!important;}
+ .cr-notfound{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50vh;text-align:center;padding:40px;}
+ .cr-notfound h2{font-family:'Josefin Sans',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:12px;}
+ .cr-notfound p{color:var(--soft);max-width:400px;line-height:1.7;margin-bottom:20px;}
+
+ /* ===== PRE-JOIN SCREEN (Zoom-like lobby) ===== */
+ .prejoin{position:fixed;inset:0;top:68px;z-index:150;background:var(--off);display:flex;align-items:center;justify-content:center;overflow-y:auto;padding:20px;}
+ .prejoin-card{background:white;border-radius:20px;box-shadow:var(--shadow-md);width:100%;max-width:860px;display:grid;grid-template-columns:1fr 1fr;gap:0;overflow:hidden;animation:fadeUp 0.4s ease both;}
+ .prejoin-video{background:#1a1e2b;padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:380px;position:relative;}
+ .prejoin-video video{width:100%;max-width:340px;border-radius:14px;background:#2a2e3b;aspect-ratio:4/3;object-fit:cover;transform:scaleX(-1);}
+ .prejoin-video-placeholder{width:100%;max-width:340px;border-radius:14px;background:#2a2e3b;aspect-ratio:4/3;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);gap:10px;font-size:0.9rem;}
+ .prejoin-video-placeholder .pj-icon{font-size:3rem;opacity:0.5;}
+ .pj-device-select{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+ .pj-device-select select{background:rgba(0,0,0,0.55);color:white;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:6px 10px;font-size:0.75rem;max-width:160px;cursor:pointer;}
+ .pj-device-select select option{background:#1a1e2b;color:white;}
+ .pj-mic-test{display:flex;align-items:center;gap:8px;margin-top:12px;color:rgba(255,255,255,0.6);font-size:0.78rem;}
+ .pj-mic-bar{width:100px;height:4px;background:rgba(255,255,255,0.15);border-radius:4px;overflow:hidden;}
+ .pj-mic-bar-fill{height:100%;background:var(--blue);border-radius:4px;transition:width 0.1s;width:0%;}
+ .pj-mic-test .pj-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+ .pj-mic-test .pj-dot.muted{background:var(--coral);}
+ .prejoin-info{padding:32px 28px;display:flex;flex-direction:column;justify-content:center;}
+ .prejoin-info .pj-badge{display:inline-block;background:var(--blue-lt);color:var(--blue-dk);font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;padding:4px 12px;border-radius:50px;margin-bottom:10px;width:fit-content;}
+ .prejoin-info h2{font-family:'Josefin Sans',sans-serif;font-size:1.6rem;font-weight:700;margin-bottom:6px;}
+ .prejoin-info .pj-meta{font-size:0.88rem;color:var(--soft);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:8px;}
+ .prejoin-info .pj-meta span{background:var(--off);padding:4px 12px;border-radius:6px;font-weight:600;}
+ .pj-checks{display:flex;flex-direction:column;gap:8px;margin-bottom:22px;}
+ .pj-check{display:flex;align-items:center;gap:8px;font-size:0.83rem;color:var(--soft);padding:6px 0;}
+ .pj-check .pj-check-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;flex-shrink:0;}
+ .pj-check.pass .pj-check-icon{background:var(--green-lt);color:var(--green);}
+ .pj-check.fail .pj-check-icon{background:var(--coral-lt);color:var(--coral);}
+ .pj-check.pending .pj-check-icon{background:var(--off);color:var(--lighter);border:1.5px solid var(--border);}
+ .pj-check .pj-check-label{flex:1;}
+ .pj-check .pj-retry{font-size:0.7rem;color:var(--blue);cursor:pointer;font-weight:700;text-decoration:underline;}
+ .pj-actions{display:flex;gap:10px;flex-wrap:wrap;}
+ .pj-actions .btn-blue{font-size:1rem;padding:14px 32px;flex:1;text-align:center;min-width:140px;}
+ .pj-actions .btn-ghost-sm{background:transparent;color:var(--soft);border:1.5px solid var(--border);padding:13px 20px;border-radius:50px;font-weight:700;font-size:0.88rem;cursor:pointer;transition:all 0.2s;}
+ .pj-actions .btn-ghost-sm:hover{background:var(--off);border-color:var(--lighter);}
+
+ /* ===== IN-MEETING CONTROLS OVERLAY ===== */
+ .cr-controls{position:absolute;bottom:24px;left:24px;z-index:120;display:flex;align-items:center;gap:6px;background:rgba(30,41,59,0.92);backdrop-filter:blur(12px);padding:10px 14px;border-radius:50px;box-shadow:0 4px 24px rgba(0,0,0,0.35);transition:opacity 0.3s,transform 0.3s;}
+ .cr-controls.hidden{opacity:0;transform:translateY(16px);pointer-events:none;}
+ .cr-ctrl-btn{width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,0.1);color:white;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s,transform 0.15s;position:relative;}
+ .cr-ctrl-btn:hover{background:rgba(255,255,255,0.2);transform:scale(1.05);}
+ .cr-ctrl-btn:active{transform:scale(0.93);}
+ .cr-ctrl-btn.active{background:var(--coral);}
+ .cr-ctrl-btn.active:hover{background:#c94a36;}
+ .cr-ctrl-btn .cr-badge{position:absolute;top:-4px;right:-4px;background:var(--coral);color:white;font-size:0.6rem;font-weight:800;padding:2px 6px;border-radius:50px;min-width:16px;text-align:center;}
+ .cr-ctrl-sep{width:1px;height:28px;background:rgba(255,255,255,0.12);flex-shrink:0;}
+ .cr-ctrl-leave{background:var(--coral);color:white;border:none;border-radius:50px;padding:8px 20px;font-weight:700;font-size:0.85rem;cursor:pointer;transition:background 0.2s;margin-left:4px;}
+ .cr-ctrl-leave:hover{background:#c94a36;}
+ .cr-ctrl-label{color:rgba(255,255,255,0.5);font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}
+
+ /* Connection quality indicator */
+ .cr-conn{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,0.5);font-size:0.7rem;font-weight:600;padding:4px 10px;background:rgba(255,255,255,0.06);border-radius:50px;margin-right:4px;}
+ .cr-conn .conn-dot{width:6px;height:6px;border-radius:50%;}
+ .cr-conn.conn-good .conn-dot{background:#22c55e;}
+ .cr-conn.conn-fair .conn-dot{background:#f5c842;}
+ .cr-conn.conn-poor .conn-dot{background:#e8604a;}
+ .cr-conn.conn-unknown .conn-dot{background:rgba(255,255,255,0.2);}
+
+ /* Meeting timer */
+ .cr-timer{color:rgba(255,255,255,0.6);font-size:0.78rem;font-weight:600;font-variant-numeric:tabular-nums;padding:4px 8px;}
+
+ /* Auto-hide controls */
+ .cr-controls-wrap{position:absolute;inset:0;pointer-events:none;z-index:110;}
+ .cr-controls-wrap .cr-controls{pointer-events:all;}
+ .cr-controls-wrap .cr-header{pointer-events:all;}
+ .cr-controls-ghost{position:absolute;inset:0;pointer-events:all;}
+
+ /* ===== TROUBLESHOOTING PAGE ===== */
+ .troubleshoot-wrap{max-width:780px;margin:0 auto;}
+ .ts-checklist{display:flex;flex-direction:column;gap:14px;margin:28px 0;}
+ .ts-item{background:white;border:1.5px solid var(--border);border-radius:var(--radius);padding:2px;overflow:hidden;transition:border-color 0.2s;}
+ .ts-item.pass{border-color:var(--green);}
+ .ts-item.fail{border-color:var(--coral);}
+ .ts-item summary{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;font-weight:700;font-size:0.93rem;list-style:none;}
+ .ts-item summary::-webkit-details-marker{display:none;}
+ .ts-item summary .ts-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.7rem;font-weight:700;}
+ .ts-item summary .ts-icon.pass{background:var(--green-lt);color:var(--green);}
+ .ts-item summary .ts-icon.fail{background:var(--coral-lt);color:var(--coral);}
+ .ts-item summary .ts-icon.neutral{background:var(--off);color:var(--lighter);border:1.5px solid var(--border);}
+ .ts-item summary .ts-label{flex:1;}
+ .ts-item summary .ts-arrow{color:var(--lighter);font-size:0.7rem;transition:transform 0.2s;}
+ .ts-item[open] summary .ts-arrow{transform:rotate(180deg);}
+ .ts-detail{padding:0 18px 18px;font-size:0.88rem;color:var(--soft);line-height:1.72;}
+ .ts-detail p{margin-bottom:8px;}
+ .ts-detail code{background:var(--off);padding:2px 6px;border-radius:4px;font-size:0.83rem;}
+ .ts-detail ul{padding-left:18px;margin-bottom:8px;}
+ .ts-detail li{margin-bottom:4px;}
+ .ts-detail .btn-ts{display:inline-block;background:var(--blue);color:white;border:none;border-radius:50px;padding:8px 18px;font-weight:700;font-size:0.82rem;cursor:pointer;margin-top:6px;transition:background 0.2s;}
+ .ts-detail .btn-ts:hover{background:var(--blue-dk);}
+
+ /* Browser compatibility banner */
+ .ts-browser-banner{background:var(--yellow-lt);border:1.5px solid #ddc850;border-radius:var(--radius);padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+ .ts-browser-banner .ts-bb-icon{font-size:1.4rem;}
+ .ts-browser-banner .ts-bb-text{flex:1;font-size:0.9rem;color:var(--text);}
+ .ts-browser-banner .ts-bb-text strong{font-weight:800;}
+
+ /* ===== DEBUG PANEL ===== */
+ .debug-panel{display:none;position:fixed;top:68px;right:20px;width:380px;max-height:calc(100vh - 100px);background:rgba(30,41,59,0.96);backdrop-filter:blur(14px);border-radius:16px;z-index:160;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);animation:fadeUp 0.25s ease both;}
+ .debug-panel.open{display:flex;flex-direction:column;}
+ .debug-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,0.06);}
+ .debug-header h3{font-size:0.85rem;font-weight:700;color:white;font-family:'Josefin Sans',sans-serif;}
+ .debug-close{background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1.1rem;padding:4px;}
+ .debug-close:hover{color:white;}
+ .debug-body{padding:16px 18px;overflow-y:auto;flex:1;}
+ .debug-section{margin-bottom:16px;}
+ .debug-section h4{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,0.35);margin-bottom:8px;}
+ .debug-row{display:flex;justify-content:space-between;padding:4px 0;font-size:0.8rem;color:rgba(255,255,255,0.7);}
+ .debug-row .db-label{color:rgba(255,255,255,0.4);}
+ .debug-row .db-value{text-align:right;max-width:55%;word-break:break-all;}
+ .debug-log{background:rgba(0,0,0,0.3);border-radius:8px;padding:10px 12px;font-family:monospace;font-size:0.72rem;color:rgba(255,255,255,0.55);max-height:180px;overflow-y:auto;line-height:1.6;}
+ .debug-log .log-entry{margin-bottom:2px;}
+ .debug-log .log-entry .log-time{color:rgba(255,255,255,0.25);}
+ .debug-log .log-entry .log-info{color:rgba(255,255,255,0.6);}
+ .debug-log .log-entry .log-warn{color:#f5c842;}
+ .debug-log .log-entry .log-error{color:#e8604a;}
+ .debug-btn{position:absolute;bottom:80px;right:20px;z-index:125;width:40px;height:40px;border-radius:50%;background:rgba(30,41,59,0.85);backdrop-filter:blur(8px);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.1);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+ .debug-btn:hover{background:rgba(30,41,59,0.95);color:white;}
+
+ /* ===== TROUBLESHOOTING BUTTON IN PRE-JOIN ===== */
+ .pj-help-btn{display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;color:var(--lighter);cursor:pointer;text-decoration:underline;transition:color 0.2s;margin-top:12px;}
+ .pj-help-btn:hover{color:var(--blue);}
+ /* Name input in pre-join */
+ .pj-name-row{margin-bottom:16px;}
+ .pj-name-label{display:block;font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--lighter);margin-bottom:4px;}
+ .pj-name-input{width:100%;padding:10px 14px;border:2px solid var(--border);border-radius:10px;font-family:'Josefin Sans',sans-serif;font-size:1rem;font-weight:600;color:var(--text);background:white;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}
+ .pj-name-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(42,171,130,0.15);}
+ .pj-name-input::placeholder{color:var(--lighter);font-weight:400;}
+
+ /* Pre-join responsive */
+ @media(max-width:700px){
+ .prejoin-card{grid-template-columns:1fr;max-width:420px;}
+ .prejoin-video{min-height:260px;padding:24px 18px;}
+ .prejoin-info{padding:24px 20px;}
+ .debug-panel{right:10px;width:calc(100% - 20px);max-height:calc(100vh - 80px);}
+ .cr-controls{gap:4px;padding:8px 12px;}
+ .cr-ctrl-btn{width:34px;height:34px;font-size:0.85rem;}
+ .cr-ctrl-leave{padding:6px 14px;font-size:0.78rem;}
+ }
+
+ /* Connection status strip inside pre-join */
+ .pj-conn-status{display:flex;align-items:center;gap:8px;background:var(--off);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:18px;}
+ .pj-conn-status .pjc-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+ .pj-conn-status.checked-ok .pjc-dot{background:var(--green);}
+ .pj-conn-status.checked-fail .pjc-dot{background:var(--coral);}
+ .pj-conn-status.checking .pjc-dot{background:var(--yellow);animation:pulse-dot 0.8s ease-in-out infinite;}
+ @keyframes pulse-dot{0%,100%{opacity:0.4;}50%{opacity:1;}}
+ .pj-conn-status .pjc-text{flex:1;font-size:0.83rem;color:var(--soft);}
+ .pj-conn-status .pjc-action{font-size:0.75rem;color:var(--blue);cursor:pointer;font-weight:700;}
+
+ /* Screen share indicator */
+ .cr-screenshare-indicator{display:none;position:absolute;top:80px;left:50%;transform:translateX(-50%);z-index:115;background:rgba(30,41,59,0.9);backdrop-filter:blur(8px);color:white;padding:8px 18px;border-radius:50px;font-size:0.82rem;font-weight:700;gap:8px;align-items:center;}
+ .cr-screenshare-indicator.show{display:flex;}
+ .cr-screenshare-indicator .ss-stop{background:var(--coral);color:white;border:none;border-radius:50px;padding:4px 12px;font-size:0.72rem;font-weight:700;cursor:pointer;}
+
+ /* Meeting participant count badge */
+ .cr-participant-count{display:flex;align-items:center;gap:4px;color:rgba(255,255,255,0.5);font-size:0.72rem;font-weight:600;padding:4px 10px;background:rgba(255,255,255,0.06);border-radius:50px;}
+ .cr-participant-count .pc-icon{font-size:0.75rem;}
+ </style>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<nav>
+ <div class="nav-brand" onclick="showPage('home')">
+ <div class="nav-circle">K</div>
+ <div class="nav-brand-text">Kids Teaching <span>Kids</span></div>
+ </div>
+ <div class="nav-links" id="navLinks">
+ <a onclick="showPage('home');cm()">Home</a>
+ <a onclick="showPage('courses');cm()">Courses</a>
+ <a onclick="showPage('about');cm()">About Us</a>
+ <a onclick="showPage('history');cm()">Our History</a>
+ <a onclick="showPage('staff');cm()">Staff</a>
+  <a onclick="showPage('joinclass');cm()">Join Class</a>
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSc3uQJE6gYcZKurAlEyoNaD4GSxCNq9xm81yJtp_flL2gaFaw/viewform?usp=header" target="_blank">Join KTK</a>
+ <a onclick="showPage('signup');cm()" class="nav-enroll">Teacher Login</a>
+ </div>
+ <button class="hamburger" onclick="tm()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+ <div class="hero">
+ <div class="hero-particles"><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div><div class="particle"></div></div>
+ <div class="dot-field-wrap" id="heroDotField"></div>
+ <div class="hero-inner">
+ <div class="hero-badge gradient-border gradient-border-fast"> Free · Online · Student-Run</div>
+ <h1>KIDS<br><em>Teaching</em><br>KIDS</h1>
+ <p class="hero-sub">A student-led nonprofit offering free online courses for elementary and middle school students taught by passionate student volunteers.</p>
+ <div class="hero-btns">
+ <a href="https://docs.google.com/forms/d/e/1FAIpQLSc3uQJE6gYcZKurAlEyoNaD4GSxCNq9xm81yJtp_flL2gaFaw/viewform?usp=header" target="_blank" class="btn-white btn-magnetic btn-pulse"> Sign Up for Updates</a>
+ <span class="btn-ghost btn-magnetic" onclick="showPage('about')">Learn More →</span>
+ </div>
+ </div>
+ </div>
+
+ <div class="marquee-wrap">
+ <div class="marquee-track">
+ <span class="marquee-item"><span class="mi-dot"></span>Math</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Science</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Writing</span>
+ <span class="marquee-item"><span class="mi-dot"></span>History</span>
+ <span class="marquee-item"><span class="mi-dot"></span>English</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Biology</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Spanish</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Entrepreneurship</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Math</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Science</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Writing</span>
+ <span class="marquee-item"><span class="mi-dot"></span>History</span>
+ <span class="marquee-item"><span class="mi-dot"></span>English</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Biology</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Spanish</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Entrepreneurship</span> <span class="marquee-item"><span class="mi-dot"></span>Math</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Science</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Writing</span>
+ <span class="marquee-item"><span class="mi-dot"></span>History</span>
+ <span class="marquee-item"><span class="mi-dot"></span>English</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Biology</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Spanish</span>
+ <span class="marquee-item"><span class="mi-dot"></span>Entrepreneurship</span>
+ </div>
+ </div>
+
+ <section class="section" style="background:white;">
+ <div class="section-inner section-center">
+ <span class="eyebrow blur-text">Our Mission</span>
+ <h2 class="stitle blur-text">What is Kids Teaching Kids?</h2>
+ <p class="slead">We are a student-run nonprofit that hosts free online courses throughout the year for elementary and middle school students. Our community-based approach covers English, science, history, math and more. We believe in creating a strong academic base and introducing supplemental lessons in an engaging way.</p>
+ <span class="btn-outline" onclick="showPage('about')">Read More About Us</span>
+ </div>
+ </section>
+
+ <section class="section" style="background:var(--off);">
+ <div class="section-inner section-center">
+ <span class="eyebrow blur-text">How It Works</span>
+ <h2 class="stitle blur-text">3 Simple Steps</h2>
+ <div class="how-grid">
+ <div class="how-card reveal gradient-border gradient-border-green">
+ <div class="how-icon">1</div>
+ <h3>Sign Up as a Student</h3>
+ <p>Fill out our quick Google Form with your child's name, grade, and the course they'd like to join.</p>
+ </div>
+ <div class="how-card reveal reveal-delay-1 gradient-border gradient-border-blue">
+ <div class="how-icon g">2</div>
+ <h3>Join Your Class Online</h3>
+  <p>You'll receive a link by email. Click it at the scheduled time from any device — easy!</p>
+ </div>
+ <div class="how-card reveal reveal-delay-2 gradient-border gradient-border-coral">
+ <div class="how-icon y">3</div>
+ <h3>Learn!</h3>
+ <p>Enjoy fun, engaging sessions with friendly student teachers who genuinely care about your growth.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <section class="section" style="background:var(--blue);padding:48px 24px;">
+ <div class="section-inner section-center">
+ <div class="stats-row">
+ <div class="stat-box"><div class="stat-num" data-target="500">0</div><div class="stat-label">Students Taught</div></div>
+ <div class="stat-box"><div class="stat-num" data-target="40">0</div><div class="stat-label">Student Teachers</div></div>
+ <div class="stat-box"><div class="stat-num" data-target="15">0</div><div class="stat-label">Courses Offered</div></div>
+ <div class="stat-box"><div class="stat-num" data-target="6">0</div><div class="stat-label">Years Running</div></div>
+ </div>
+ </div>
+ </section>
+
+ <section class="section" style="background:white;">
+ <div class="section-inner">
+ <div class="section-center" style="margin-bottom:0;">
+ <span class="eyebrow blur-text">Testimonials</span>
+ <h2 class="stitle blur-text">What Families Are Saying</h2>
+ </div>
+ <div class="quotes-grid reveal">
+ <div class="quotes-col">
+ <h3>Parents Say</h3>
+ <div class="quote-stack">
+ <div class="q"><div class="q-text">"Great program."</div><div class="q-by">Maple</div></div>
+ <div class="q"><div class="q-text">"The teachers explain concepts clearly."</div><div class="q-by">Yachao</div></div>
+ <div class="q"><div class="q-text">"I like how KTK offers a variety of courses."</div><div class="q-by">Yun</div></div>
+ <div class="q"><div class="q-text">"Great at teaching and explaining!"</div><div class="q-by">Shailee</div></div>
+ <div class="q"><div class="q-text">"The teacher engaged students in class and provided good feedback on writing assignments."</div><div class="q-by">Xuan</div></div>
+ </div>
+ </div>
+ <div class="quotes-col">
+ <h3>Students Say</h3>
+ <div class="quote-stack">
+ <div class="q gr"><div class="q-text">"I liked math and writing best. My favorite part is answering questions in class."</div><div class="q-by">Anonymous</div></div>
+ <div class="q gr"><div class="q-text">"I liked learning science a lot."</div><div class="q-by">Anonymous</div></div>
+ <div class="q gr"><div class="q-text">"The lessons are easy to understand."</div><div class="q-by">Anonymous</div></div>
+ <div class="q gr"><div class="q-text">"I liked typing a story about my figure skating experience and sharing it with my teacher."</div><div class="q-by">Eleanor</div></div>
+ <div class="q gr"><div class="q-text">"I enjoyed the classes."</div><div class="q-by">Misha</div></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <div class="contact-band">
+ <h2>Contact Us</h2>
+ <p>Have questions about our courses? Interested in volunteering? We'd love to hear from you.</p>
+ <a href="mailto:ktkacton@gmail.com" class="email-a">ktkacton@gmail.com</a>
+ <div class="socials">
+ <a href="https://www.facebook.com/groups/431314825265364/" target="_blank" class="social-pill">Facebook</a>
+ <a href="http://youtube.com/channel/UCNuIQ_j2DDlwjOzOw4ySuvg" target="_blank" class="social-pill">YouTube</a>
+ <a href="mailto:ktkacton@gmail.com" class="social-pill">Email Us</a>
+ </div>
+ </div>
+</div>
+
+
+<!-- COURSES -->
+<div class="page" id="page-courses">
+ <section class="section">
+ <div class="section-inner courses-inner">
+ <span class="eyebrow blur-text">Now Enrolling</span>
+ <h2 class="stitle blur-text">Available Courses</h2>
+ <p class="slead">Free online classes for K–8 students, held live on our platform. All of our courses are free. Pick a course below and sign up today!</p>
+ <div class="su-card gradient-border gradient-border-green" id="signup-form-card" style="margin-bottom:32px;">
+ <h3 style="font-family:'Josefin Sans',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:4px;">Sign Up for a Course</h3>
+ <p style="font-size:0.88rem;color:var(--soft);margin-bottom:20px;">Free online classes for K-8 students. Takes less than 2 minutes. You will receive a confirmation email with details and schedule.</p>
+ <div class="fg"><label>Parent / Guardian Name</label><input type="text" id="su-parent" placeholder="Jane Smith"/></div>
+ <div class="fg"><label>Email Address</label><input type="email" id="su-email" placeholder="jane@email.com"/></div>
+ <div class="fg"><label>Child's Full Name</label><input type="text" id="su-child" placeholder="Alex"/></div>
+ <div class="fg"><label>Child's Grade</label><select id="su-grade"><option value="">Select grade...</option><option>K</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option></select></div>
+ <div class="fg"><label>Course Interested In</label><select id="su-course"><option value="">Select a course...</option><option>Beginner AMC 8 Prep</option><option>Math Fundamentals</option><option>Geometry</option><option>Pre-Algebra</option><option>Spanish Fundamentals</option><option>Entrepreneurship 101</option></select></div>
+ <p style="font-size:0.82rem;color:var(--lighter);margin-bottom:16px;">All courses are held in the Eastern Time Zone.</p>
+ <div class="fg"><label>Anything else? (optional)</label><textarea id="su-notes" rows="3" placeholder="Questions or accommodations..." style="resize:vertical;"></textarea></div>
+ <button class="btn-blue" onclick="submitSignup()" style="width:100%;margin-top:4px;">Sign My Child Up!</button>
+ <p style="font-size:0.8rem;color:var(--lighter);margin-top:10px;text-align:center;">We will send a confirmation email within 24 hours with your class details.</p>
+ 
+</div>
+<div id="signup-success" style="display:none;text-align:center;padding:40px 20px;">
+ <h3 style="font-family:'Josefin Sans',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:8px;">We will see you in class!</h3>
+ <p style="font-size:0.9rem;color:var(--soft);">A confirmation email has been sent. Check your inbox for class details and schedule.</p>
+ <button class="btn-blue" onclick="document.getElementById('signup-success').style.display='none';document.getElementById('signup-form-card').style.display='block';" style="margin-top:16px;">Sign Up Another Child</button>
+</div>
+ <div class="course-list">
+
+ <!-- Beginner AMC 8 Prep -->
+ <div class="course-card" style="flex-direction:column;gap:12px;">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+ <div>
+ <span class="subj-pill sp-math">Math</span>
+ <h3 class="c-name">Beginner AMC 8 Prep</h3>
+ <p class="c-tag">Teacher: Saina Joshi · Grades 4–8</p>
+ </div>
+ </div>
+ <p class="c-desc">A beginner-friendly course designed to introduce students to the types of problems found on the AMC 8 competition. Covers foundational problem-solving strategies in algebra, geometry, number sense, and logical reasoning. No prior competition experience needed.</p>
+ <div class="c-meta" style="flex-wrap:wrap;">
+ <span class="c-meta-item">Sundays, 2:00–3:00 PM ET</span>
+ <span class="c-meta-item">⏱ 8 classes</span>
+ <span class="c-meta-item">Oct 4, 11, 18, 25 · Nov 1, 8, 15, 22</span>
+ </div>
+ </div>
+
+ <!-- Math Fundamentals -->
+ <div class="course-card" style="flex-direction:column;gap:12px;">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+ <div>
+ <span class="subj-pill sp-math">Math</span>
+ <h3 class="c-name">Math Fundamentals</h3>
+ <p class="c-tag">Teacher: Max Geng · Grades K–5</p>
+ </div>
+ </div>
+ <p class="c-desc">A fun, hands-on course that builds confidence with core elementary math concepts. Students will work through arithmetic, place value, simple fractions, and word problems in a relaxed, supportive environment. Great for building a strong math foundation.</p>
+ <div class="c-meta" style="flex-wrap:wrap;">
+ <span class="c-meta-item">Saturdays, 11:00 AM–12:00 PM ET</span>
+ <span class="c-meta-item">⏱ 8 classes</span>
+ <span class="c-meta-item">Oct 3, 10, 17, 24, 31 · Nov 7, 14, 21</span>
+ </div>
+ </div>
+
+ <!-- Geometry -->
+ <div class="course-card" style="flex-direction:column;gap:12px;">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+ <div>
+ <span class="subj-pill sp-math">Math</span>
+ <h3 class="c-name">Geometry</h3>
+ <p class="c-tag">Teacher: Ayan Nayak · Grades 7–9</p>
+ </div>
+ </div>
+ <p class="c-desc">Explore shapes, angles, proofs, and spatial reasoning. Students will learn how to think logically about geometric relationships and solve problems involving triangles, quadrilaterals, circles, and coordinate geometry.</p>
+ <div class="c-meta" style="flex-wrap:wrap;">
+ <span class="c-meta-item">Sundays, 1:00–1:45 PM ET</span>
+ <span class="c-meta-item">⏱ 6 classes</span>
+ <span class="c-meta-item">Oct 4, 11, 18, 25 · Nov 1, 8</span>
+ </div>
+ </div>
+
+ <!-- Pre-Algebra -->
+ <div class="course-card" style="flex-direction:column;gap:12px;">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+ <div>
+ <span class="subj-pill sp-math">Math</span>
+ <h3 class="c-name">Pre-Algebra</h3>
+ <p class="c-tag">Teacher: Arya Nayak · Grades 5–8</p>
+ </div>
+ </div>
+ <p class="c-desc">Bridge the gap between arithmetic and algebra. Students will work with variables, expressions, equations, inequalities, and introductory graphing. Designed for students who want to build a solid foundation before moving into formal algebra.</p>
+ <div class="c-meta" style="flex-wrap:wrap;">
+ <span class="c-meta-item">Fridays, 5:15–6:00 PM ET</span>
+ <span class="c-meta-item">⏱ 6 classes</span>
+ <span class="c-meta-item">Oct 2, 9, 16, 23, 30 · Nov 6</span>
+ </div>
+ </div>
+
+ <!-- Spanish Fundamentals -->
+ <div class="course-card" style="flex-direction:column;gap:12px;">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+ <div>
+ <span class="subj-pill sp-lang">Spanish</span>
+ <h3 class="c-name">Spanish Fundamentals</h3>
+ <p class="c-tag">Teacher: Josephine Abakah · Grades 6–7</p>
+ </div>
+ </div>
+ <p class="c-desc">A beginner-friendly introduction to Spanish. Students will learn basic vocabulary, greetings, everyday phrases, and simple conversation skills. Perfect for students with no prior Spanish experience who want to get started.</p>
+ <div class="c-meta" style="flex-wrap:wrap;">
+ <span class="c-meta-item">Sundays, 12:00–1:00 PM ET</span>
+ <span class="c-meta-item">⏱ 8 classes</span>
+ <span class="c-meta-item">Oct 4, 11, 18, 25 · Nov 1, 8, 15, 22</span>
+ </div>
+ </div>
+
+ <!-- Entrepreneurship 101 -->
+ <div class="course-card" style="flex-direction:column;gap:12px;">
+ <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+ <div>
+ <span class="subj-pill sp-biz">Business</span>
+ <h3 class="c-name">Entrepreneurship 101</h3>
+ <p class="c-tag">Teacher: Anjaneya Aggarwal · Grades 6–12</p>
+ </div>
+ </div>
+ <p class="c-desc">Learn how real businesses are built from the ground up. Students will explore ideation, market research, pitching, and the basics of entrepreneurship. Includes hands-on activities and a final project where students create and present their own business idea.</p>
+ <div class="c-meta" style="flex-wrap:wrap;">
+ <span class="c-meta-item">Mondays, 3:00–4:00 PM ET</span>
+ <span class="c-meta-item">⏱ 8 classes</span>
+ <span class="c-meta-item">Oct 5, 12, 19, 26 · Nov 2, 9, 16, 23</span>
+ </div>
+ </div>
+
+ </div>
+ </div>
+ </section>
+</div>
+
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+ <section class="section">
+ <div class="section-inner">
+ <span class="eyebrow blur-text">About Us</span>
+ <h2 class="stitle blur-text">Who Is "Kids Teaching Kids"?</h2>
+ <div class="about-body">
+ <p>Around April of 2020, students began attending school online. And while working from the comfort of home had its perks, the amount of education a child received decreased. It wasn't the same.</p>
+ <p>So, a few teenagers gathered to make a small difference. Every Friday, just for an hour, they'd have two lessons for little five or six-year-olds to enjoy. Over time, the number of teachers increased, as did the number of students.</p>
+ <p>We chose the name <strong>"Kids Teaching Kids"</strong> because, well, we're not exactly professionals. But we work to achieve our goal of creating an engaging and educational learning experience for young kids. We simplify complex topics to make learning both fun and effective, ensuring every child can benefit from our resources.</p>
+ <p>Currently, we offer a variety of courses in areas like <strong>writing, biology, and math</strong>. These classes are designed to provide valuable student learning resources in an engaging format. We welcome you to experience our classes and discover if they're the right fit for your learning journey.</p>
+ <div class="about-sign">We hope to see you there,<br>The Kids That Teach Kids 💙</div>
+ </div>
+ <div style="text-align:center;margin:32px 0 16px;">
+ <h3 style="margin-bottom:8px;">Community Outreach</h3>
+ <p style="max-width:600px;margin:0 auto;color:var(--lighter);">Beyond our online courses, KTK connects with the community in person through events like bake sales at local shops. These events help raise awareness, fund our programs, and let people see what we're all about.</p>
+ </div>
+ <div class="bake-sale-gallery" style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:16px 0 32px;">
+ <img src="images/bake-sale-1.jpg" alt="KTK Bake Sale" style="width:400px;height:300px;object-fit:cover;border-radius:12px;border:2px solid var(--border);"/>
+ <img src="images/bake-sale-2.jpg" alt="KTK Bake Sale" style="width:400px;height:300px;object-fit:cover;border-radius:12px;border:2px solid var(--border);"/>
+ <img src="images/bake-sale-3.jpg" alt="KTK Bake Sale" style="width:400px;height:300px;object-fit:cover;border-radius:12px;border:2px solid var(--border);"/>
+ </div>
+ <hr class="div">
+ <div class="feats">
+ <div class="feat gradient-border gradient-border-green"><div class="feat-dot" style="width:36px;height:36px;border-radius:50%;background:var(--blue-lt);margin:0 auto 10px;"></div><h4>Online via Video</h4><p>All classes are held live on our platform — join from any device, anywhere at home.</p></div>
+ <div class="feat gradient-border gradient-border-blue"><div class="feat-dot" style="width:36px;height:36px;border-radius:50%;background:var(--green-lt);margin:0 auto 10px;"></div><h4>Student Teachers</h4><p>Taught by passionate student volunteers from across our chapters.</p></div>
+ <div class="feat gradient-border gradient-border-coral"><div class="feat-dot" style="width:36px;height:36px;border-radius:50%;background:var(--yellow-lt);margin:0 auto 10px;"></div><h4>Always Free</h4><p>No fees, ever. Accessible education for every child in our community.</p></div>
+ <div class="feat gradient-border gradient-border-purple"><div class="feat-dot" style="width:36px;height:36px;border-radius:50%;background:var(--green-lt);margin:0 auto 10px;"></div><h4>Founded 2020</h4><p>Born during COVID-19 by local students who wanted to make a difference.</p></div>
+ <div class="feat gradient-border gradient-border-green"><div class="feat-dot" style="width:36px;height:36px;border-radius:50%;background:var(--blue-lt);margin:0 auto 10px;"></div><h4>Community-Based</h4><p>Rooted in local communities, serving students and families wherever they are.</p></div>
+ <div class="feat gradient-border gradient-border-blue"><div class="feat-dot" style="width:36px;height:36px;border-radius:50%;background:var(--yellow-lt);margin:0 auto 10px;"></div><h4>Grades K–8</h4><p>Courses for elementary and middle school students across all subjects.</p></div>
+ </div>
+  <div class="chinatown" style="display:flex;gap:40px;align-items:center;flex-wrap:wrap;">
+  <div style="flex:1;min-width:240px;">
+  <h3>Support KTK</h3>
+  <p>Kids Teaching Kids is a student-run nonprofit, and we rely on the generosity of our community to keep our programs free and accessible. Your donations help us provide resources, expand our course offerings, and reach more students.</p>
+  <p>If you'd like to support our mission, scan the QR code or click the button below to donate. Every contribution makes a difference!</p>
+  <a href="https://www.paypal.com/qrcodes/managed/7dfc9182-2f69-4e28-8e81-9fe549cc1abf" target="_blank" class="btn-outline">Donate via PayPal →</a>
+  </div>
+  <div style="flex-shrink:0;text-align:center;">
+  <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://www.paypal.com/qrcodes/managed/7dfc9182-2f69-4e28-8e81-9fe549cc1abf" alt="Donate via PayPal QR Code" style="width:180px;height:180px;border-radius:12px;border:2px solid var(--border);"/>
+  <p style="font-size:0.75rem;color:var(--lighter);margin-top:6px;">Scan to donate</p>
+  </div>
+  </div>
+ </div>
+ </section>
+</div>
+
+
+<!-- HISTORY -->
+<div class="page" id="page-history">
+ <section class="section">
+ <div class="section-inner">
+ <span class="eyebrow blur-text">Our History</span>
+ <h2 class="stitle blur-text">How It All Began</h2>
+ <p class="slead">From a small Friday afternoon video call to a thriving nonprofit — here's the KTK story.</p>
+ <div class="timeline">
+ <div class="tl-item">
+ <div class="tl-dot">2020</div>
+ <div class="tl-yr">Spring 2020</div>
+ <div class="tl-box"><h3>Founded During the Pandemic</h3><p>In April 2020, as schools shifted online, a group of local 8th-grade students decided to act. They hosted simple Friday sessions for kindergarteners two lessons, a little warmth, and a lot of heart.</p></div>
+ </div>
+ <div class="tl-item">
+ <div class="tl-dot">2021</div>
+ <div class="tl-yr">2021 Growing</div>
+ <div class="tl-box"><h3>Expanding the Team & Subjects</h3><p>Word spread. More student volunteers joined, enrollment climbed, and subjects expanded from basic literacy to math, science, and more.</p></div>
+ </div>
+ <div class="tl-item">
+ <div class="tl-dot">2022</div>
+ <div class="tl-yr">2022 Official</div>
+ <div class="tl-box"><h3>Becoming a Nonprofit</h3><p>KTK officially incorporated as a student-run nonprofit with a formal board a President, Vice Presidents, and Marketing Director, all high school students.</p></div>
+ </div>
+ <div class="tl-item">
+ <div class="tl-dot">Now</div>
+ <div class="tl-yr">Today</div>
+ <div class="tl-box"><h3>Thriving & Expanding</h3><p>Multiple courses every season Cell Biology to Advanced Math with a diverse team from ABRHS and RJ Grey. The mission stays the same: make learning fun, free, and for everyone.</p></div>
+ </div>
+ </div>
+ </div>
+ </section>
+</div>
+
+
+<!-- STAFF -->
+<div class="page" id="page-staff">
+ <section class="section">
+ <div class="section-inner wide">
+ <div class="section-center" style="margin-bottom:48px;">
+ <span class="eyebrow blur-text">Meet the Team</span>
+ <h2 class="stitle blur-text">The People Behind KTK</h2>
+   <p class="slead" style="margin-bottom:0;">Our board leads the organization, and our instructors bring every class to life all of them students themselves.</p>
+  </div>
+
+   <div class="slabel blur-text">Leadership Team</div>
+  <div class="ssub">Meet the people who lead and run KTK!</div>
+  <div class="board-grid">
+  <div class="s-card tilt-card"><div class="s-ph"><img src="images/Ayaan.jpg" alt="Ayaan Garg"></div><div class="s-info"><div class="s-role">Co-President</div><div class="s-name">Ayaan Garg</div><div class="s-bio">A sophomore at ABRHS who likes to play tennis and learn new math concepts. He loves to research and code, and has participated in numerous math-related state competitions. Whenever classmates are stuck, Ayaan is always willing to help!</div></div></div>
+  <div class="s-card tilt-card"><div class="s-ph gph"><div class="s-init">TK</div></div><div class="s-info"><div class="s-role">Co-President</div><div class="s-name">Tarun Kannan</div><div class="s-bio">A Senior at ABRHS with a deep interest in STEM research. Has been playing soccer competitively for 10 years and loves teaching STEM courses to young students!</div></div></div>
+  <div class="s-card tilt-card"><div class="s-ph"><img src="images/Anish.jpg" alt="Anish Misro" style="object-position:center 50%;"></div><div class="s-info"><div class="s-role">Vice President</div><div class="s-name">Anish Misro</div><div class="s-bio">A sophomore at ABRHS who loves soccer, basketball, volunteering at a local church, and is involved in science research, robotics, and debate. Excited to support younger students through KTK!</div></div></div>
+  <div class="s-card tilt-card"><div class="s-ph yph"><div class="s-init">SS</div></div><div class="s-info"><div class="s-role">Vice President</div><div class="s-name">Supreet Sathish</div><div class="s-bio">A Junior at ABRHS who participates in Speech and Volunteering, and manages marketing for many businesses including KTK. Enjoys basketball, TV, and hanging out with friends.</div></div></div>
+  <div class="s-card tilt-card"><div class="s-ph gph"><div class="s-init">MC</div></div><div class="s-info"><div class="s-role">Director of Technology</div><div class="s-name">Maadhav Chandra</div><div class="s-bio">A 10th grader at ABRHS who enjoys family, volleyball, and coding. Always willing to step in and help when classmates are struggling.</div></div></div>
+  <div class="s-card tilt-card"><div class="s-ph"><img src="images/AanyaGarg.png" alt="Aanya Garg"></div><div class="s-info"><div class="s-role">Director of Logistics</div><div class="s-name">Aanya Garg</div><div class="s-bio">Aanya is currently in 8th grade at RJ Grey Junior High School and loves learning, especially when it comes to math and science. She has participated in several math competitions, where she has learned a lot and enjoyed participating in. When she's not studying, you can find her playing tennis, reading, or listening to music. Aanya often helps her classmates who are struggling and explains it to them. She is excited to support students to learn and grow through KTK!</div></div></div>
+  <div class="s-card tilt-card"><div class="s-ph"><img src="images/Aidan.jpg" alt="Aidan Abayasinghe" style="object-fit:contain;background:white;padding:0 12px;box-sizing:border-box;"></div><div class="s-info"><div class="s-role">Director of Outreach</div><div class="s-name">Aidan Abayasinghe</div><div class="s-bio">A sophomore at ABRHS who loves friends and growing plants! Known for enthusiasm and positivity his motto: keep moving forward, no matter what.</div></div></div>
+  </div>
+
+  <div class="slabel blur-text" style="margin-top:48px;">Chapter Heads</div>
+  <div class="ssub">Leading KTK chapters around the world!</div>
+  <div class="fac-grid">
+  <div class="s-card"><div class="s-ph"><div class="s-init">SG</div></div><div class="s-info"><div class="s-role">Livingston (NJ) Chapter Head</div><div class="s-name">Siddhanth Ganesh</div><div class="s-bio">A passionate leader bringing KTK to Livingston, New Jersey, dedicated to expanding free educational opportunities to more students.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Raunit.png" alt="Raunit Sharma"></div><div class="s-info"><div class="s-role">Seattle (WA) Chapter Head</div><div class="s-name">Raunit Sharma</div><div class="s-bio">Passionate about building AI-powered software, exploring technologies, and creating products that solve real-world problems. He enjoys teaching computer science at KTK and is always looking for opportunities to make an impact.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/SrikrishnaNuvvula.png" alt="Srikrishna Nuvvula"></div><div class="s-info"><div class="s-role">Dallas (TX) Chapter Head</div><div class="s-name">Srikrishna Nuvvula</div><div class="s-bio">A sophomore at Rock Hill High School in Texas with a big interest in computer science and artificial intelligence. Active in debate, DECA, TSA, and Red Cross. Enjoys coding, playing chess, and basketball.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Saina.jpg" alt="Saina Joshi" style="object-position: center 10%"></div><div class="s-info"><div class="s-role">Lexington (MA) Chapter Head</div><div class="s-name">Saina Joshi</div><div class="s-bio">An 8th grader at William Diamond Middle School (Lexington) who is passionate about math and solving problems. Has competed in Mathcounts Chapter Competition and the AMCs. Enjoys cooking, baking, swimming, and spending time with friends and family.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/AnjaneyaAggarwal.png" alt="Anjaneya Aggarwal"></div><div class="s-info"><div class="s-role">Westford (MA) Chapter Head</div><div class="s-name">Anjaneya Aggarwal</div><div class="s-bio">A rising sophomore at WA who enjoys Math, Science, and Business. Qualified for the International Career Development Conference as part of DECA and is a competitive swimmer.</div></div></div>
+  <div class="s-card"><div class="s-ph gph"><div class="s-init">JN</div></div><div class="s-info"><div class="s-role">Madrid (Spain) Chapter Head</div><div class="s-name">Juan Nieto</div><div class="s-bio">A rising senior from Madrid, Spain who enjoys playing soccer and spending free time with his guitar. Always looking forward to educating kids in his hometown through KTK!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/quinten.jpeg" alt="Quinten Karess"></div><div class="s-info"><div class="s-role">Co-Chapter Head (Acton)</div><div class="s-name">Quinten Karess</div><div class="s-bio">Bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Aaditya.png" alt="Aaditya Barik"></div><div class="s-info"><div class="s-role">Co-Chapter Head (Acton)</div><div class="s-name">Aaditya Barik</div><div class="s-bio">A rising sophomore at ABRHS who helps with Math, Science, and English. Has competed in math competitions and Science Olympiad; also a competitive swimmer.</div></div></div>
+  </div>
+
+  <div class="slabel blur-text" style="margin-top:48px;">Instructors</div>
+  <div class="ssub">Our dedicated instructors!</div>
+  <div class="fac-grid">
+  <div class="s-card"><div class="s-ph"><img src="images/Warren.jpeg" alt="Warren Zha"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Warren Zha</div><div class="s-bio">A freshman at ABRHS with passion for piano and math competitions. Eager to make every student comfortable, have fun, and learn.</div></div></div>
+  <div class="s-card"><div class="s-ph gph"><div class="s-init">NP</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Nethra Packiam</div><div class="s-bio">An 8th grader at RJ Grey who loves teaching, math, and science. Plays violin in her school orchestra and tennis on the court.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Meghan.jpg" alt="Meghan Li" style="object-position:35% 45%;transform:scale(1.4);transform-origin:35% 45%;"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Meghan Li</div><div class="s-bio">A freshman at ABRHS. Won Best of Show in the 2024 Duck Stamp Contest and the World Dance Championships. Taught Spanish, dance, and cooking online during COVID!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Arya.png" alt="Arya Nayak" style="object-position:center 45%;"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Arya Nayak</div><div class="s-bio">A 9th grader who placed 12th at Mathcounts Chapter, qualified for Mathcounts State 2025, and earned AMC 8 Honor Roll (Top 5%) in 2024 and 2025.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Ayan.jpg" alt="Ayan Nayak"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Ayan Nayak</div><div class="s-bio">A rising 7th grader at RJ Grey. Scored 20 on AMC 8 2025, achieved 25/25 on USAMTS Round 2, and reached USACO Silver. Also a competitive swimmer.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Max.png" alt="Max Geng"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Max Geng</div><div class="s-bio">A rising sophomore at ABRHS teaching math and music in simple, fun ways. Enjoys piano, swimming, and sports outside of KTK.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Ashmit.png" alt="Ashmit Patnaik"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Ashmit Patnaik</div><div class="s-bio">An 8th grader at R.J. Grey Junior High who has competed in math competitions and participated in mathcounts as well as debate competitions. Also a Boy Scout who enjoys helping others learn. Outside of all of this, you can find him playing basketball or soccer. Excited to guide and support younger students through KTK!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Josephine.png" alt="Josephine Abakah" style="object-position:center 40%;"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Josephine Abakah</div><div class="s-bio">A rising sophomore who played varsity basketball and track, making it to states. Her class leader, passionate about helping others truly understand.</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/Hanwen.png" alt="Hanwen Tang"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Hanwen Tang</div><div class="s-bio">A sophomore at ABRHS who enjoys coding, debate, math, flute, and volunteering at programs from chess to basketball. Thrilled to help kids learn!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/krithangaddam.png" alt="Krithan Gaddam" style="object-position:center 20%;"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Krithan Gaddam</div><div class="s-bio">A sophomore at ABRHS with a passion for leadership, research, and community involvement. As a varsity volleyball player, he has developed strong teamwork, discipline, and communication skills both on and off the court. He enjoys exploring research opportunities and is always eager to learn something new. Known for being outgoing, approachable, and kind, Krithan values building meaningful connections and creating a welcoming environment for those around him. He is excited to contribute to KTK and make a positive impact through service and collaboration.</div></div></div>
+  <div class="s-card"><div class="s-ph"><div class="s-init">KA</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Kavya Arora</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph gph"><div class="s-init">NH</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Nahom Hailu</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph cph"><div class="s-init">KK</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Krish Kapoor</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph pph"><div class="s-init">AJ</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Anya Jain</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/noush.jpg" alt="Kianoush Razban"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Kianoush Razban</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph"><img src="images/saharsh.jpg" alt="Saharsh Komatireddy"></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Saharsh Komatireddy</div><div class="s-bio">An 11th grader at ABRHS who enjoys family, volleyball, and building things. Always willing to step in and help when classmates are struggling.</div></div></div>
+  <div class="s-card"><div class="s-ph"><div class="s-init">AA</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Aadit Anantha</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph gph"><div class="s-init">SS</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Shruti Sivaraman</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph cph"><div class="s-init">RV</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Rishab Vedantham</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph pph"><div class="s-init">AV</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Abhiram Vuppuluri</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph yph"><div class="s-init">AR</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Alex Romm</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  <div class="s-card"><div class="s-ph"><div class="s-init">LZ</div></div><div class="s-info"><div class="s-role">Instructor</div><div class="s-name">Lucas Zhang</div><div class="s-bio">Profile pic and bio coming soon!</div></div></div>
+  </div>
+ </div>
+ </section>
+</div>
+
+
+<!-- JOIN -->
+<div class="page" id="page-join">
+ <section class="section">
+ <div class="section-inner">
+ <span class="eyebrow blur-text">Volunteer</span>
+ <h2 class="stitle blur-text">Join KTK</h2>
+ <p class="slead">Kids Teaching Kids is looking for student volunteers to become new teachers and TAs! We offer volunteer hours for teaching, TAing, and preparing course material. All classes are held on our platform. No prior experience needed.</p>
+ <div class="join-top gradient-border gradient-border-green">
+ <h2>Ready to Make a Difference?</h2>
+ <p>You can start by TAing existing courses until you're ready to lead your own. It's flexible, rewarding, and earns volunteer hours!</p>
+ <a href="https://forms.gle/CghUg2yYpWLDgXcN7" target="_blank" class="btn-white"> Fill Out Our Hiree Form →</a>
+ </div>
+ <div class="roles">
+ <div class="role-card">
+ <h3>Teaching at KTK</h3>
+ <p>Looking for teachers who will engage and educate elementary and middle schoolers. Have a subject you love? Come in with your own course ideas or we can assign you one. Details shared during the interview!</p>
+ <p style="margin-top:10px;">Email questions to <a href="mailto:ktkacton@gmail.com" style="color:var(--blue);font-weight:700;">ktkacton@gmail.com</a></p>
+ </div>
+ <div class="role-card">
+ <h3>TAing at KTK</h3>
+ <p>A TA monitors the class, helps if technical issues arise, records lessons on request, takes attendance, and keeps class running smoothly. No preparation needed — perfect for getting started!</p>
+ </div>
+ </div>
+ <h3 style="font-family:'Josefin Sans',sans-serif;font-size:1.35rem;margin-bottom:18px;">Why Join?</h3>
+ <div class="why-row">
+ <div class="why-card gradient-border gradient-border-green"><div class="why-n">1</div><h4>Real Teaching Experience</h4><p>Witness student growth firsthand and learn what it's like to be a teacher.</p></div>
+ <div class="why-card gradient-border gradient-border-blue"><div class="why-n">2</div><h4>Volunteer Hours</h4><p>Earn hours for teaching, TAing, and prep work great for college apps!</p></div>
+ <div class="why-card gradient-border gradient-border-purple"><div class="why-n">3</div><h4>Set Your Own Schedule</h4><p>One course or every season you decide. Total flexibility.</p></div>
+ </div>
+      <div class="add-info">
+        <h3>Additional Info for Teachers</h3>
+        <p>As a teacher, you set the time and dates for your classes. KTK will advertise your course to students and families.</p>
+        <p>Classes are hosted on our platform, so you will need a slideshow or Google Doc to share on screen. Including text, pictures, and occasional videos helps keep students engaged.</p>
+        <p>Courses should have at least 4 lessons (up to around 10) around a single topic. Classes run 30 to 60 minutes, once a week. Co-teaching with another student is always welcome!</p>
+      </div>
+
+      <div class="add-info" style="margin-top:20px;">
+        <h3>Additional Info for Chapter Heads</h3>
+        <p>Chapter heads are responsible for building and managing KTK in their local area. This includes recruiting student teachers, coordinating course schedules, and making sure classes run smoothly.</p>
+        <p>You will work closely with the KTK board and have full support as you grow your chapter. No prior experience running an organization is necessary, just drive and a genuine interest in education.</p>
+        <p>If you are interested in starting a chapter in your school or community, reach out at <a href="mailto:ktkacton@gmail.com" style="color:var(--blue-dk);font-weight:700;">ktkacton@gmail.com</a> and we will walk you through the process.</p>
+      </div>
+ </div>
+ </section>
+</div>
+
+
+<!-- TEACHER LOGIN -->
+<div class="page" id="page-signup">
+ <section class="section">
+ <div class="su-wrap">
+ <div class="section-center" style="margin-bottom:36px;">
+ <span class="eyebrow blur-text">Teachers</span>
+ <h2 class="stitle blur-text">Teacher Login</h2>
+ <p class="slead" style="margin-bottom:0;">Enter your name, teacher code, and password to access your dashboard.</p>
+ </div>
+
+ <!-- Login Form -->
+ <div class="su-card gradient-border gradient-border-blue" id="tl-login">
+ <div class="fg"><label>Your Name</label><input type="text" id="tl-name" placeholder="First and last name"/></div>
+ <div class="fg"><label>Teacher Code</label><input type="text" id="tl-code" placeholder="e.g. AA2026" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/></div>
+ <div class="fg"><label>Password</label><input type="password" id="tl-pass" placeholder="Your password"/></div>
+ <button class="btn-sub" onclick="teacherCodeLogin()">Log In</button>
+ <div id="tl-error" style="display:none;color:#c0392b;font-size:0.85rem;text-align:center;margin-top:10px;"></div>
+ </div>
+
+ <!-- Dashboard (hidden until login) -->
+ <div id="tl-dashboard" style="display:none;">
+ <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:24px;">
+ <div>
+ <span class="eyebrow blur-text">Dashboard</span>
+ <h2 class="stitle blur-text" id="tl-welcome">Welcome, Teacher!</h2>
+ </div>
+ <button class="btn-outline" onclick="teacherCodeLogout()">Log Out</button>
+ </div>
+ <div id="tl-courses-list"></div>
+ </div>
+ </div>
+ </section>
+</div>
+
+<!-- JOIN CLASS -->
+<div class="page" id="page-joinclass">
+ <section class="section">
+  <div class="jc-wrap">
+   <div class="section-center" style="margin-bottom:36px;">
+    <span class="eyebrow blur-text">Join a Class</span>
+    <h2 class="stitle blur-text">Enter Your Class Code</h2>
+    <p class="slead" style="margin-bottom:0;">Enter the code your teacher gave you to join your class and access the Zoom link.</p>
+   </div>
+
+   <!-- Code Input -->
+   <div class="su-card gradient-border gradient-border-blue" id="jc-student-panel">
+    <div class="jc-code-input">
+     <input type="text" id="jc-code" maxlength="10" placeholder="e.g. AA2026" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/>
+     <br/>
+     <button class="btn-blue" onclick="joinByCode()">Join Class</button>
+    </div>
+    <div id="jc-error" style="display:none;color:#c0392b;font-size:0.85rem;text-align:center;margin-top:10px;"></div>
+   </div>
+
+   <!-- Class Info (hidden until code is entered) -->
+   <div id="jc-class-info" style="display:none;margin-top:24px;">
+    <div class="su-card gradient-border gradient-border-green" style="text-align:center;">
+     <h3 id="jc-class-name" style="font-family:'Josefin Sans',sans-serif;font-size:1.3rem;font-weight:700;margin-bottom:4px;"></h3>
+     <p id="jc-class-teacher" style="font-size:0.9rem;color:var(--soft);margin-bottom:12px;"></p>
+     <p id="jc-class-schedule" style="font-size:0.85rem;color:var(--lighter);margin-bottom:4px;"></p>
+     <p id="jc-class-dates" style="font-size:0.85rem;color:var(--lighter);margin-bottom:20px;"></p>
+     <a id="jc-class-zoom" href="#" target="_blank" class="btn-blue" style="display:inline-block;padding:12px 32px;font-size:1rem;">Join Zoom →</a>
+    </div>
+   </div>
+
+   <div class="jc-toggle" style="margin-top:24px;"><a onclick="showPage('signup');cm()" style="color:var(--blue);font-weight:700;">Teachers — Log in to generate a class code →</a></div>
+  </div>
+ </section>
+</div>
+
+<!-- SCROLL TO TOP -->
+<button id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="position:fixed;bottom:28px;right:28px;width:48px;height:48px;border-radius:50%;background:var(--blue);color:white;border:none;font-size:1.2rem;cursor:pointer;z-index:200;opacity:0;transform:translateY(20px);transition:opacity 0.3s,transform 0.3s,background 0.2s;box-shadow:0 4px 16px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;">↑</button>
+
+<!-- CONFETTI CANVAS -->
+<canvas id="confettiCanvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999;"></canvas>
+
+
+<footer style="position:relative;overflow:hidden;">
+ <div class="dot-field-wrap" id="footerDotField"></div>
+ <div style="position:relative;z-index:1;">
+ <div class="flogo">Kids Teaching <span>Kids</span></div>
+ <p>A student-run nonprofit · Founded 2020</p>
+ <hr class="fdiv"/>
+ <div class="flinks">
+ <a onclick="showPage('home')">Home</a>
+ <a onclick="showPage('courses')">Courses</a>
+ <a onclick="showPage('about')">About</a>
+ <a onclick="showPage('history')">History</a>
+ <a onclick="showPage('staff')">Staff</a>
+  <a onclick="showPage('joinclass')">Join Class</a>
+  <a onclick="showPage('join')">Join Us</a>
+  <a href="mailto:ktkacton@gmail.com">ktkacton@gmail.com</a>
+ </div>
+ <p style="font-size:0.73rem;opacity:0.35;margin-top:8px;">© 2026 KTK. All rights reserved.</p>
+ </div>
+</footer>
+
+<script>
+ // FIREBASE INIT
+ firebase.initializeApp({
+  apiKey: "AIzaSyDhv3ogKNT8ru9yXFQKmDYR0hNxTq7a340",
+  authDomain: "ktk-acton-21aa9.firebaseapp.com",
+  projectId: "ktk-acton-21aa9",
+  storageBucket: "ktk-acton-21aa9.firebasestorage.app",
+  messagingSenderId: "546488025596",
+  appId: "1:546488025596:web:ad54130d2279f9690f7279"
+ });
+ const db = firebase.firestore();
+ const auth = firebase.auth();
+ const TEACHER_SECRET = 'KTK2026';
+ // Teacher codes — each code links a teacher to their courses
+ const teacherCodes = {
+  'SJ2026': { name: 'Saina Joshi', email: 'saina@ktkacton.com', password: 'Sa!Jn-KTK26', courses: ['Beginner AMC 8 Prep'] },
+  'MG2026': { name: 'Max Geng', email: 'max@ktkacton.com', password: 'Mx#Gng-26!', courses: ['Math Fundamentals'] },
+  'AN2026': { name: 'Ayan Nayak', email: 'ayan@ktkacton.com', password: 'Ayan', courses: ['Geometry'] },
+  'ARYA26': { name: 'Arya Nayak', email: 'arya@ktkacton.com', password: 'Ar!Nyk-26&', courses: ['Pre-Algebra'] },
+  'JA2026': { name: 'Josephine Abakah', email: 'josie@ktkacton.com', password: 'Js@Abk-KT26', courses: ['Spanish Fundamentals'] },
+  'AA2026': { name: 'Anjaneya Aggarwal', email: 'anjaneya@ktkacton.com', password: 'Anj@Agg-KT26', courses: ['Entrepreneurship 101'] }
+};
+ const teacherZoomLinks = {
+  'Beginner AMC 8 Prep': 'https://us06web.zoom.us/meeting/register/P43h2XhhSW6dQ0cdTMZSuQ',
+  'Math Fundamentals': 'https://us06web.zoom.us/meeting/register/j7X_OKc2TmWuz28diyCEMg',
+  'Geometry': 'https://us06web.zoom.us/meeting/register/QBLHRFtOTxeS03hoNqXrgw',
+  'Pre-Algebra': 'https://us06web.zoom.us/meeting/register/2LpkCrqEQ2yAk5bmu4c-iw',
+  'Spanish Fundamentals': 'https://us06web.zoom.us/meeting/register/csjHrOrATVSykLDJbHDR3Q',
+  'Entrepreneurship 101': 'https://us06web.zoom.us/meeting/register/-MucSmXTSCWXvmiZDf_kwg'
+ };
+ const teacherCourseDetails = {
+  'Beginner AMC 8 Prep': { grades: '4–8', schedule: 'Sundays, 2:00–3:00 PM ET', dates: 'Oct 4, 11, 18, 25 · Nov 1, 8, 15, 22' },
+  'Math Fundamentals': { grades: 'K–5', schedule: 'Saturdays, 11:00 AM–12:00 PM ET', dates: 'Oct 3, 10, 17, 24, 31 · Nov 7, 14, 21' },
+  'Geometry': { grades: '7–9', schedule: 'Sundays, 1:00–1:45 PM ET', dates: 'Oct 4, 11, 18, 25 · Nov 1, 8' },
+  'Pre-Algebra': { grades: '5–8', schedule: 'Fridays, 5:15–6:00 PM ET', dates: 'Oct 2, 9, 16, 23, 30 · Nov 6' },
+  'Spanish Fundamentals': { grades: '6–7', schedule: 'Sundays, 12:00–1:00 PM ET', dates: 'Oct 4, 11, 18, 25 · Nov 1, 8, 15, 22' },
+  'Entrepreneurship 101': { grades: '6–12', schedule: 'Mondays, 3:00–4:00 PM ET', dates: 'Oct 5, 12, 19, 26 · Nov 2, 9, 16, 23' }
+ };
+
+ 
+ 
+ 
+ // ===== STUDENT CLASS CODE LOOKUP =====
+ // Class codes map to courses with Zoom links
+ const classCodeData = {
+  'SJ2026': { course: 'Beginner AMC 8 Prep', teacher: 'Saina Joshi', schedule: 'Sundays, 2:00-3:00 PM ET', dates: 'Oct 4, 11, 18, 25; Nov 1, 8, 15, 22', zoom: 'https://us06web.zoom.us/meeting/register/P43h2XhhSW6dQ0cdTMZSuQ' },
+  'MG2026': { course: 'Math Fundamentals', teacher: 'Max Geng', schedule: 'Saturdays, 11:00 AM-12:00 PM ET', dates: 'Oct 3, 10, 17, 24, 31; Nov 7, 14, 21', zoom: 'https://us06web.zoom.us/meeting/register/j7X_OKc2TmWuz28diyCEMg' },
+  'AN2026': { course: 'Geometry', teacher: 'Ayan Nayak', schedule: 'Sundays, 1:00-1:45 PM ET', dates: 'Oct 4, 11, 18, 25; Nov 1, 8', zoom: 'https://us06web.zoom.us/meeting/register/QBLHRFtOTxeS03hoNqXrgw' },
+  'ARYA26': { course: 'Pre-Algebra', teacher: 'Arya Nayak', schedule: 'Fridays, 5:15-6:00 PM ET', dates: 'Oct 2, 9, 16, 23, 30; Nov 6', zoom: 'https://us06web.zoom.us/meeting/register/2LpkCrqEQ2yAk5bmu4c-iw' },
+  'JA2026': { course: 'Spanish Fundamentals', teacher: 'Josephine Abakah', schedule: 'Sundays, 12:00-1:00 PM ET', dates: 'Oct 4, 11, 18, 25; Nov 1, 8, 15, 22', zoom: 'https://us06web.zoom.us/meeting/register/csjHrOrATVSykLDJbHDR3Q' },
+  'AA2026': { course: 'Entrepreneurship 101', teacher: 'Anjaneya Aggarwal', schedule: 'Mondays, 3:00-4:00 PM ET', dates: 'Oct 5, 12, 19, 26; Nov 2, 9, 16, 23', zoom: 'https://us06web.zoom.us/meeting/register/-MucSmXTSCWXvmiZDf_kwg' }
+ };
+
+ function joinByCode(){
+  const code = document.getElementById('jc-code').value.trim().toUpperCase();
+  const err = document.getElementById('jc-error');
+  const info = document.getElementById('jc-class-info');
+  err.style.display = 'none';
+  info.style.display = 'none';
+  if(!code){err.textContent='Please enter a class code.';err.style.display='block';return;}
+  const data = classCodeData[code];
+  if(!data){err.textContent='Invalid code. Please check with your teacher.';err.style.display='block';return;}
+  document.getElementById('jc-class-name').textContent = data.course;
+  document.getElementById('jc-class-teacher').textContent = 'Teacher: ' + data.teacher;
+  document.getElementById('jc-class-schedule').textContent = data.schedule;
+  document.getElementById('jc-class-dates').textContent = data.dates;
+  document.getElementById('jc-class-zoom').href = data.zoom;
+  info.style.display = 'block';
+ }
+
+ // ===== TEACHER CODE LOGIN =====
+ var currentTeacher = null;
+   // ===== STUDENT SIGNUP =====
+ // REPLACE THIS URL with your Google Apps Script web app URL after deploying
+ // EmailJS + Sheet.best
+ var SHEET_API='https://api.sheetbest.com/sheets/e21f6dbb-5123-4b18-82d3-152da8c09a8d';
+ function submitSignup(){
+  var parent=document.getElementById('su-parent').value.trim();
+  var email=document.getElementById('su-email').value.trim();
+  var child=document.getElementById('su-child').value.trim();
+  var grade=document.getElementById('su-grade').value;
+  var course=document.getElementById('su-course').value;
+  var notes=document.getElementById('su-notes').value.trim();
+  if(!parent||!email||!child||!grade||!course){
+   alert('Please fill in all required fields.');
+   return;
+  }
+  if(!email.includes('@')){
+   alert('Please enter a valid email address.');
+   return;
+  }
+  var btn=document.querySelector('#signup-form-card .btn-blue');
+  if(btn){btn.textContent='Signing up...';btn.disabled=true;}
+  // Save to Google Sheet via Sheet.best
+  fetch(SHEET_API,{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({Timestamp:new Date().toISOString(),'Parent Name':parent,'Email':email,'Child Name':child,'Grade':grade,'Course':course,Notes:notes})
+  }).catch(function(e){console.error('Sheet save failed:',e);});
+  // Send confirmation email via EmailJS
+  emailjs.send('service_dkqr24l','template_tt28eul',{
+   parentName:parent,
+   email:email,
+   childName:child,
+   grade:grade,
+   course:course,
+   notes:notes
+  }).then(function(){
+   document.getElementById('signup-form-card').style.display='none';
+   document.getElementById('signup-success').style.display='block';
+   fireConfetti();
+  }).catch(function(err){
+   console.error('EmailJS error:',err);
+   document.getElementById('signup-form-card').style.display='none';
+   document.getElementById('signup-success').style.display='block';
+   fireConfetti();
+  });
+ }
+
+function teacherCodeLogin(){
+  const name = document.getElementById('tl-name').value.trim();
+  const code = document.getElementById('tl-code').value.trim().toUpperCase();
+  const pass = document.getElementById('tl-pass').value;
+  const err = document.getElementById('tl-error');
+  err.style.display = 'none';
+  if(!name || !code){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+  const teacher = teacherCodes[code];
+  if(!teacher){err.textContent='Invalid teacher code. Please check and try again.';err.style.display='block';return;}
+  if(pass !== teacher.password){err.textContent='Incorrect password. Please try again.';err.style.display='block';return;}
+  currentTeacher = { name: name, code: code, courses: teacher.courses };
+  document.getElementById('tl-login').style.display='none';
+  document.getElementById('tl-dashboard').style.display='block';
+  document.getElementById('tl-welcome').textContent='Welcome, ' + name + '!';
+  renderTeacherDashboard();
+ }
+ function renderTeacherDashboard(){
+  const container = document.getElementById('tl-courses-list');
+  container.innerHTML = '';
+  currentTeacher.courses.forEach(function(courseName){
+   const details = teacherCourseDetails[courseName] || {};
+   const zoomLink = teacherZoomLinks[courseName] || '#';
+
+   const card = document.createElement('div');
+   card.className = 'course-card';
+   card.style.cssText = 'flex-direction:column;gap:12px;margin-bottom:20px;';
+
+   const topRow = document.createElement('div');
+   topRow.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;';
+
+   const infoDiv = document.createElement('div');
+   const pill = document.createElement('span');
+   pill.className = 'subj-pill sp-math';
+   pill.textContent = 'Your Course';
+   const nameEl = document.createElement('h3');
+   nameEl.className = 'c-name';
+   nameEl.textContent = courseName;
+   const grade = document.createElement('p');
+   grade.className = 'c-tag';
+   grade.textContent = 'Grades ' + (details.grades||'');
+   infoDiv.appendChild(pill);
+   infoDiv.appendChild(nameEl);
+   infoDiv.appendChild(grade);
+
+   const btnDiv = document.createElement('div');
+   btnDiv.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
+
+   const startBtn = document.createElement('button');
+   startBtn.className = 'btn-green';
+   startBtn.style.cssText = 'padding:10px 20px;';
+   startBtn.textContent = 'Start Class';
+   startBtn.addEventListener('click', function(){ startClass(courseName); });
+
+   const zoomBtn = document.createElement('a');
+   zoomBtn.href = zoomLink;
+   zoomBtn.target = '_blank';
+   zoomBtn.className = 'btn-blue';
+   zoomBtn.textContent = 'Manual Zoom Link';
+
+   btnDiv.appendChild(startBtn);
+   btnDiv.appendChild(zoomBtn);
+   topRow.appendChild(infoDiv);
+   topRow.appendChild(btnDiv);
+   card.appendChild(topRow);
+
+   const metaRow = document.createElement('div');
+   metaRow.className = 'c-meta';
+   metaRow.style.cssText = 'flex-wrap:wrap;';
+   const sched = document.createElement('span');
+   sched.className = 'c-meta-item';
+   sched.textContent = 'Schedule: ' + (details.schedule||'');
+   const datesEl = document.createElement('span');
+   datesEl.className = 'c-meta-item';
+   datesEl.textContent = 'Dates: ' + (details.dates||'');
+   metaRow.appendChild(sched);
+   metaRow.appendChild(datesEl);
+   card.appendChild(metaRow);
+
+   const studentsDiv = document.createElement('div');
+   studentsDiv.id = 'tl-students-' + courseName.replace(/\s+/g,'-');
+   const loadingP = document.createElement('p');
+   loadingP.style.cssText = 'font-size:0.85rem;color:var(--lighter);margin-top:8px;';
+   loadingP.textContent = 'Loading enrolled students...';
+   studentsDiv.appendChild(loadingP);
+   card.appendChild(studentsDiv);
+
+   container.appendChild(card);
+   loadEnrolledStudents(courseName);
+  });
+ }
+ function loadEnrolledStudents(courseName){
+  const sectionId = 'tl-students-' + courseName.replace(/\s+/g,'-');
+  const section = document.getElementById(sectionId);
+  if(!section) return;
+  if(SIGNUP_API==='YOUR_WEBAPP_URL'){
+   section.innerHTML = '<p style="font-size:0.85rem;color:var(--lighter);">Signups not configured yet.</p>';
+   return;
+  }
+  fetch(SIGNUP_API+'?action=getStudents&course='+encodeURIComponent(courseName))
+   .then(function(r){return r.json();})
+   .then(function(data){
+    if(!data.success||!data.students||data.students.length===0){
+     section.innerHTML = '<p style="font-size:0.85rem;color:var(--lighter);">No students enrolled yet.</p>';
+     return;
+    }
+    let html = '<p style="font-size:0.85rem;font-weight:700;margin-top:10px;margin-bottom:6px;">Enrolled Students (' + data.students.length + ')</p>';
+    html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+    data.students.forEach(function(s){
+     html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--off);border-radius:8px;border:1px solid var(--border);font-size:0.85rem;">' +
+      '<span><strong>' + (s.childName||'Student') + '</strong> · Grade ' + (s.grade||'?') + '</span>' +
+      '<span style="color:var(--lighter);">' + (s.email||'') + '</span></div>';
+    });
+    html += '</div>';
+    section.innerHTML = html;
+   }).catch(function(err){
+    section.innerHTML = '<p style="font-size:0.85rem;color:#c0392b;">Could not load students.</p>';
+    console.error(err);
+   });
+ }
+
+ // Start Class - creates a live Zoom meeting via API
+ async function startClass(courseName){
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Starting...';
+  btn.style.opacity = '0.6';
+
+  try {
+   const details = teacherCourseDetails[courseName] || {};
+   const teacher = teacherCodes[currentTeacher.code];
+
+   const response = await fetch('http://localhost:3001/api/create-meeting', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+     courseId: currentTeacher.code,
+     courseName: courseName,
+     teacherEmail: teacher.email,
+     duration: 60,
+     timezone: 'America/New_York'
+    })
+   });
+
+   const data = await response.json();
+
+   if(data.success){
+    btn.textContent = 'Class Started!';
+    btn.style.background = '#27ae60';
+    const card = btn.closest('.course-card');
+    const meta = card.querySelector('.c-meta');
+    const meetingInfo = document.createElement('div');
+    meetingInfo.style.cssText = 'margin-top:12px;padding:12px;background:rgba(39,174,96,0.1);border-radius:8px;border:1px solid rgba(39,174,96,0.3);';
+    const p1 = document.createElement('p');
+    p1.style.cssText = 'font-size:0.85rem;font-weight:700;color:#27ae60;margin-bottom:8px;';
+    p1.textContent = 'Meeting Created - You are the host!';
+    meetingInfo.appendChild(p1);
+
+    const p2 = document.createElement('p');
+    p2.style.cssText = 'font-size:0.8rem;color:var(--lighter);margin-bottom:8px;';
+    p2.textContent = 'Meeting ID: ' + data.meetingId;
+    meetingInfo.appendChild(p2);
+
+    const joinBtn = document.createElement('a');
+    joinBtn.href = data.joinUrl;
+    joinBtn.target = '_blank';
+    joinBtn.className = 'btn-green';
+    joinBtn.style.cssText = 'display:inline-block;padding:8px 16px;font-size:0.9rem;';
+    joinBtn.textContent = 'Join as Host';
+    meetingInfo.appendChild(joinBtn);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn-outline';
+    copyBtn.style.cssText = 'margin-left:8px;padding:8px 16px;font-size:0.9rem;';
+    copyBtn.textContent = 'Copy Link for Students';
+    const zoomUrl = data.joinUrl;
+    copyBtn.addEventListener('click', function() {
+      navigator.clipboard.writeText(zoomUrl).then(function() {
+        alert('Link copied! Share this with your students.');
+      }).catch(function() {
+        prompt('Copy this link:', zoomUrl);
+      });
+    });
+    meetingInfo.appendChild(copyBtn);
+
+    meta.parentNode.insertBefore(meetingInfo, meta.nextSibling);
+    teacherZoomLinks[courseName] = data.joinUrl;
+   } else {
+    throw new Error(data.error || 'Failed to create meeting');
+   }
+  } catch(err){
+   console.error('Start class error:', err);
+   btn.textContent = 'Error - Try Again';
+   btn.style.background = '#c0392b';
+   setTimeout(() => {
+    btn.textContent = 'Start Class';
+    btn.style.background = '';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+   }, 3000);
+  }
+ }
+
+ function teacherCodeLogout(){
+  currentTeacher = null;
+  document.getElementById('tl-login').style.display='block';
+  document.getElementById('tl-dashboard').style.display='none';
+  document.getElementById('tl-name').value='';
+  document.getElementById('tl-code').value='';
+  document.getElementById('tl-pass').value='';
+ }
+
+ // BLUR TEXT COMPONENT (vanilla JS port of React Bits BlurText)
+ function initBlurText(root){
+  const els=(root||document).querySelectorAll('.blur-text');
+  els.forEach(el=>{
+  if(el.dataset.blurInit)return;
+  el.dataset.blurInit='1';
+  const raw=el.textContent;
+  const words=raw.split(' ');
+  el.textContent='';
+  el.style.display='flex';
+  el.style.flexWrap='wrap';
+  const spans=[];
+  words.forEach((w,i)=>{
+  const span=document.createElement('span');
+  span.className='blur-text-word';
+  span.textContent=w;
+  span.style.opacity='0';
+  span.style.filter='blur(10px)';
+  span.style.transform='translateY(-30px)';
+   span.style.transition='opacity 0.4s ease,filter 0.4s ease,transform 0.4s ease';
+   span.style.transitionDelay=(i*0.12)+'s';
+   span.style.display='inline-block';
+  el.appendChild(span);
+  spans.push(span);
+  });
+  const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+  if(e.isIntersecting){
+  spans.forEach(s=>{
+  s.style.opacity='1';
+  s.style.filter='blur(0px)';
+  s.style.transform='translateY(0)';
+  });
+  obs.unobserve(el);
+  }
+  });
+  },{threshold:0.1});
+  obs.observe(el);
+  });
+ }
+
+ // DOT FIELD COMPONENT (vanilla JS port of React Bits DotField)
+ function initDotField(containerId, opts={}){
+  const container=document.getElementById(containerId);
+  if(!container)return;
+  const cfg={
+  dotRadius:opts.dotRadius??1.5,
+  dotSpacing:opts.dotSpacing??14,
+  cursorRadius:opts.cursorRadius??500,
+  cursorForce:opts.cursorForce??0.1,
+  bulgeOnly:opts.bulgeOnly??true,
+  bulgeStrength:opts.bulgeStrength??67,
+  glowRadius:opts.glowRadius??160,
+  sparkle:opts.sparkle??false,
+  waveAmplitude:opts.waveAmplitude??0,
+  gradientFrom:opts.gradientFrom??'rgba(168,85,247,0.35)',
+  gradientTo:opts.gradientTo??'rgba(180,151,207,0.25)',
+  glowColor:opts.glowColor??'#120F17',
+  };
+  const TWO_PI=Math.PI*2;
+  const canvas=document.createElement('canvas');
+  container.appendChild(canvas);
+  const ctx=canvas.getContext('2d',{alpha:true});
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  container.appendChild(svg);
+  const glowId='dot-glow-'+Math.random().toString(36).slice(2,9);
+  svg.innerHTML=`<defs><radialGradient id="${glowId}"><stop offset="0%" stop-color="${cfg.glowColor}"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs><circle cx="-9999" cy="-9999" r="${cfg.glowRadius}" fill="url(#${glowId})" style="opacity:0;will-change:opacity;"/>`;
+  const glowEl=svg.querySelector('circle');
+  let dots=[],mouse={x:-9999,y:-9999,prevX:-9999,prevY:-9999,speed:0};
+  let size={w:0,h:0,offsetX:0,offsetY:0};
+  let glowOp=0,engagement=0,frameCount=0,raf;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+
+  function buildDots(w,h){
+  const step=cfg.dotRadius+cfg.dotSpacing;
+  const cols=Math.floor(w/step);
+  const rows=Math.floor(h/step);
+  const padX=(w%step)/2;
+  const padY=(h%step)/2;
+  dots=[];
+  for(let r=0;r<rows;r++){
+  for(let c=0;c<cols;c++){
+  const ax=padX+c*step+step/2;
+  const ay=padY+r*step+step/2;
+  dots.push({ax,ay,sx:ax,sy:ay,vx:0,vy:0,x:ax,y:ay});
+  }
+  }
+  }
+
+  function doResize(){
+  const rect=container.getBoundingClientRect();
+  const w=rect.width,h=rect.height;
+  canvas.width=w*dpr;canvas.height=h*dpr;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  size={w,h,offsetX:rect.left+window.scrollX,offsetY:rect.top+window.scrollY};
+  buildDots(w,h);
+  }
+
+  function onMouseMove(e){
+  mouse.x=e.pageX-size.offsetX;
+  mouse.y=e.pageY-size.offsetY;
+  }
+
+  function updateSpeed(){
+  const dx=mouse.prevX-mouse.x,dy=mouse.prevY-mouse.y;
+  mouse.speed+=((Math.sqrt(dx*dx+dy*dy))-mouse.speed)*0.5;
+  if(mouse.speed<0.001)mouse.speed=0;
+  mouse.prevX=mouse.x;mouse.prevY=mouse.y;
+  }
+  const speedInterval=setInterval(updateSpeed,20);
+
+  function tick(){
+  frameCount++;
+  const {w,h}=size;
+  const t=frameCount*0.02;
+  const targetEng=Math.min(mouse.speed/5,1);
+  engagement+=(targetEng-engagement)*0.06;
+  if(engagement<0.001)engagement=0;
+  glowOp+=(engagement-glowOp)*0.08;
+  if(glowEl){glowEl.setAttribute('cx',mouse.x);glowEl.setAttribute('cy',mouse.y);glowEl.style.opacity=glowOp;}
+  ctx.clearRect(0,0,w,h);
+  const grad=ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0,cfg.gradientFrom);grad.addColorStop(1,cfg.gradientTo);
+  ctx.fillStyle=grad;
+  const cr=cfg.cursorRadius,crSq=cr*cr,rad=cfg.dotRadius/2,isBulge=cfg.bulgeOnly;
+  ctx.beginPath();
+  for(let i=0;i<dots.length;i++){
+  const d=dots[i];
+  const dx=mouse.x-d.ax,dy=mouse.y-d.ay;
+  const distSq=dx*dx+dy*dy;
+  if(distSq<crSq&&engagement>0.01){
+  const dist=Math.sqrt(distSq);
+  if(isBulge){
+  const f=1-dist/cr;
+  const push=f*f*cfg.bulgeStrength*engagement;
+  const angle=Math.atan2(dy,dx);
+  d.sx+=(d.ax-Math.cos(angle)*push-d.sx)*0.15;
+  d.sy+=(d.ay-Math.sin(angle)*push-d.sy)*0.15;
+  }else{
+  const angle=Math.atan2(dy,dx);
+  const move=(500/dist)*(mouse.speed*cfg.cursorForce);
+  d.vx+=Math.cos(angle)*-move;
+  d.vy+=Math.sin(angle)*-move;
+  }
+  }else if(isBulge){
+  d.sx+=(d.ax-d.sx)*0.1;
+  d.sy+=(d.ay-d.sy)*0.1;
+  }
+  if(!isBulge){
+  d.vx*=0.9;d.vy*=0.9;
+  d.x=d.ax+d.vx;d.y=d.ay+d.vy;
+  d.sx+=(d.x-d.sx)*0.1;d.sy+=(d.y-d.sy)*0.1;
+  }
+  let drawX=d.sx,drawY=d.sy;
+  if(cfg.waveAmplitude>0){
+  drawY+=Math.sin(d.ax*0.03+t)*cfg.waveAmplitude;
+  drawX+=Math.cos(d.ay*0.03+t*0.7)*cfg.waveAmplitude*0.5;
+  }
+  if(cfg.sparkle){
+  const hash=((i*2654435761)^(frameCount>>3))>>>0;
+  if((hash%100)<3){ctx.moveTo(drawX+rad*1.8,drawY);ctx.arc(drawX,drawY,rad*1.8,0,TWO_PI);}
+  else{ctx.moveTo(drawX+rad,drawY);ctx.arc(drawX,drawY,rad,0,TWO_PI);}
+  }else{
+  ctx.moveTo(drawX+rad,drawY);ctx.arc(drawX,drawY,rad,0,TWO_PI);
+  }
+  }
+  ctx.fill();
+  raf=requestAnimationFrame(tick);
+  }
+
+  let resizeTimer;
+  function onResize(){clearTimeout(resizeTimer);resizeTimer=setTimeout(doResize,100);}
+
+  doResize();
+  window.addEventListener('resize',onResize);
+  window.addEventListener('mousemove',onMouseMove,{passive:true});
+  raf=requestAnimationFrame(tick);
+
+  return{destroy(){cancelAnimationFrame(raf);clearInterval(speedInterval);clearTimeout(resizeTimer);window.removeEventListener('resize',onResize);window.removeEventListener('mousemove',onMouseMove);}};
+ }
+
+ // Initialize DotFields after layout settles
+ setTimeout(function(){
+ initDotField('heroDotField',{
+ dotRadius:2,dotSpacing:16,bulgeStrength:80,glowRadius:200,sparkle:true,waveAmplitude:2,
+ gradientFrom:'rgba(255,255,255,0.45)',gradientTo:'rgba(200,240,225,0.25)',glowColor:'rgba(255,255,255,0.12)'
+ });
+ initDotField('footerDotField',{
+ dotRadius:1.5,dotSpacing:18,bulgeStrength:55,glowRadius:140,sparkle:true,waveAmplitude:0,
+ gradientFrom:'rgba(255,255,255,0.2)',gradientTo:'rgba(245,200,66,0.15)',glowColor:'rgba(255,255,255,0.08)'
+ });
+ initBlurText();
+ },300);
+
+ function showPage(id){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ document.getElementById('page-'+id).classList.add('active');
+ window.scrollTo({top:0,behavior:'smooth'});
+ cm();
+ // Re-init blur text on new page
+ setTimeout(function(){initBlurText(document.getElementById('page-'+id));},50);
+ }
+ function tm(){document.getElementById('navLinks').classList.toggle('open');}
+ function cm(){document.getElementById('navLinks').classList.remove('open');}
+  // ===== JOIN CLASS — STUDENT =====
+  var currentClassCode=null;
+  var currentClassData=null;
+  var isDemoMode=false;
+
+  // Demo mode: creates a test class in-memory, no Firebase needed
+  
+
+  
+
+  // Updated enterClassroom — shows pre-join screen instead of going straight in
+  
+
+  // SCROLL PROGRESS BAR
+  window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
+  document.getElementById('scrollProgress').style.width=pct+'%';
+  });
+
+  // STICKY NAV BLUR
+  window.addEventListener('scroll',()=>{
+  document.querySelector('nav').classList.toggle('scrolled',window.scrollY>30);
+  });
+
+  // SCROLL REVEAL (IntersectionObserver)
+  const revealObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');revealObs.unobserve(e.target);}});
+  },{threshold:0.15});
+  document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+
+  // ANIMATED COUNTERS
+  function startCounters(){
+  document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+  if(el.dataset.counted)return;
+  el.dataset.counted='1';
+  const target=+el.dataset.target;
+  const duration=1800;
+  const start=performance.now();
+  function tick(now){
+  const elapsed=now-start;
+  const progress=Math.min(elapsed/duration,1);
+  const eased=1-Math.pow(1-progress,3);
+  el.textContent=Math.round(eased*target);
+  if(progress<1)requestAnimationFrame(tick);
+  else el.textContent=target;
+  }
+  requestAnimationFrame(tick);
+  });
+  }
+  // Use IntersectionObserver with low threshold
+  const statsSection=document.querySelector('.stats-row');
+  if(statsSection){
+  const sObs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){startCounters();sObs.unobserve(e.target);}});
+  },{threshold:0.05});
+  sObs.observe(statsSection);
+  // Fallback: if already visible on load, start immediately
+  setTimeout(function(){
+  const r=statsSection.getBoundingClientRect();
+  if(r.top<window.innerHeight&&r.bottom>0)startCounters();
+  },1200);
+  }
+
+  // 3D TILT ON STAFF CARDS
+  document.querySelectorAll('.tilt-card').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+  const r=card.getBoundingClientRect();
+  const x=(e.clientX-r.left)/r.width-0.5;
+  const y=(e.clientY-r.top)/r.height-0.5;
+  card.style.transform=`perspective(600px) rotateY(${x*8}deg) rotateX(${-y*8}deg) scale(1.02)`;
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transform='perspective(600px) rotateY(0) rotateX(0) scale(1)';});
+  });
+
+  // MAGNETIC BUTTON EFFECT
+  document.querySelectorAll('.btn-magnetic').forEach(btn=>{
+  btn.addEventListener('mousemove',e=>{
+  const r=btn.getBoundingClientRect();
+  const x=e.clientX-r.left-r.width/2;
+  const y=e.clientY-r.top-r.height/2;
+  btn.style.transform=`translate(${x*0.15}px,${y*0.15}px) scale(1.03)`;
+  });
+  btn.addEventListener('mouseleave',()=>{btn.style.transform='';});
+  });
+
+  // RIPPLE EFFECT ON BUTTONS
+  document.querySelectorAll('.btn-sub,.btn-blue,.btn-white').forEach(btn=>{
+  btn.addEventListener('click',function(e){
+  const r=this.getBoundingClientRect();
+  const ripple=document.createElement('span');
+  ripple.className='ripple';
+  const size=Math.max(r.width,r.height);
+  ripple.style.width=ripple.style.height=size+'px';
+  ripple.style.left=(e.clientX-r.left-size/2)+'px';
+  ripple.style.top=(e.clientY-r.top-size/2)+'px';
+  this.appendChild(ripple);
+  setTimeout(()=>ripple.remove(),600);
+  });
+  });
+
+  // FOOTER LINK STAGGER ANIMATION
+  document.querySelectorAll('.flinks a').forEach((a,i)=>{
+  a.style.animationDelay=i*0.05+'s';
+  });
+
+  // PARALLAX ON HERO (subtle)
+  window.addEventListener('scroll',()=>{
+  const hero=document.querySelector('.hero');
+  if(!hero)return;
+  const y=window.scrollY;
+  if(y<600){
+  hero.style.backgroundPositionY=(-y*0.3)+'px';
+  const inner=hero.querySelector('.hero-inner');
+  if(inner)inner.style.transform='translateY('+(-y*0.15)+'px)';
+  }
+  });
+
+  // SCROLL TO TOP BUTTON
+  const stb=document.getElementById('scrollTop');
+  window.addEventListener('scroll',()=>{
+  if(window.scrollY>400){stb.style.opacity='1';stb.style.transform='translateY(0)';}
+  else{stb.style.opacity='0';stb.style.transform='translateY(20px)';}
+  });
+
+  // CONFETTI ON SIGNUP SUCCESS
+  function fireConfetti(){
+  const c=document.getElementById('confettiCanvas');
+  const ctx=c.getContext('2d');
+  c.width=window.innerWidth;
+  c.height=window.innerHeight;
+  const colors=['#2aab82','#f5c842','#e8604a','#8b6bb1','#2d7a4f','#ff6b6b','#4ecdc4'];
+  const particles=[];
+  for(let i=0;i<80;i++){
+  particles.push({
+  x:c.width/2+Math.random()*200-100,
+  y:c.height/2,
+  vx:(Math.random()-0.5)*12,
+  vy:Math.random()*-14-4,
+  w:Math.random()*8+4,
+  h:Math.random()*6+3,
+  color:colors[Math.floor(Math.random()*colors.length)],
+  rot:Math.random()*360,
+  rotV:(Math.random()-0.5)*12,
+  life:1
+  });
+  }
+  function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  let alive=false;
+  particles.forEach(p=>{
+  if(p.life<=0)return;
+  alive=true;
+  p.x+=p.vx;
+  p.vy+=0.35;
+  p.y+=p.vy;
+  p.rot+=p.rotV;
+  p.life-=0.012;
+  ctx.save();
+  ctx.translate(p.x,p.y);
+  ctx.rotate(p.rot*Math.PI/180);
+  ctx.globalAlpha=p.life;
+  ctx.fillStyle=p.color;
+  ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+  ctx.restore();
+  });
+  if(alive)requestAnimationFrame(draw);
+  else ctx.clearRect(0,0,c.width,c.height);
+  }
+  draw();
+  }
+
+  // TYPING EFFECT ON HERO SUBTITLE
+  const heroSub=document.querySelector('.hero-sub');
+  if(heroSub){
+  const fullText=heroSub.textContent;
+  heroSub.textContent='';
+  heroSub.style.visibility='visible';
+  let ti=0;
+  function typeChar(){
+  if(ti<fullText.length){
+  heroSub.textContent+=fullText[ti];
+  ti++;
+  setTimeout(typeChar,18+Math.random()*12);
+  }
+  }
+  setTimeout(typeChar,600);
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>emailjs.init("4jLD16TvpjyHq96X5");</script>
+</body>
+</html>
