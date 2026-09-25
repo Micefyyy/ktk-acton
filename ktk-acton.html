@@ -1710,11 +1710,18 @@ function teacherCodeLogin(){
  setTimeout(function(){initBlurText(document.getElementById('page-'+id));},50);
  }
  (function(){
-  var h=location.pathname.replace(/\/$/,'');
-  var id=h.substring(h.lastIndexOf('/')+1);
-  if(id && document.getElementById('page-'+id) && id!=='ktk-acton' && id!=='home'){
+  var t=null;
+  try{t=sessionStorage.getItem('ktkTab');}catch(e){}
+  if(t){try{sessionStorage.removeItem('ktkTab');}catch(e){}}
+  if(!t){
+   var h=location.pathname.replace(/\/$/,'');
+   var id=h.substring(h.lastIndexOf('/')+1).replace(/\.html$/,'');
+   if(id==='ktk-acton'||id==='')id=null;
+   t=id;
+  }
+  if(t && document.getElementById('page-'+t) && t!=='home'){
    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-   document.getElementById('page-'+id).classList.add('active');
+   document.getElementById('page-'+t).classList.add('active');
   }
  })();
  function tm(){document.getElementById('navLinks').classList.toggle('open');}
