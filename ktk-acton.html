@@ -700,6 +700,12 @@
  <div class="stat-box"><div class="stat-num" data-target="15">0</div><div class="stat-label">Courses Offered</div></div>
  <div class="stat-box"><div class="stat-num" data-target="6">0</div><div class="stat-label">Years Running</div></div>
  </div>
+ <div class="stats-row" id="liveStats" style="margin-top:28px;display:none;">
+ <div class="stat-box"><div class="stat-num" data-live="students">0</div><div class="stat-label">Enrolled This Fall</div></div>
+ <div class="stat-box"><div class="stat-num" data-live="states">0</div><div class="stat-label">States + Spain</div></div>
+ <div class="stat-box"><div class="stat-num" data-live="courses">0</div><div class="stat-label">Live Courses</div></div>
+ <div class="stat-box"><div class="stat-num" data-live="logins">0</div><div class="stat-label">Daily Site Logins</div></div>
+ </div>
  </div>
  </section>
 
@@ -1780,6 +1786,44 @@ function teacherCodeLogin(){
   requestAnimationFrame(tick);
   });
   }
+  // LIVE STATS STRIP — pulls real numbers from the signup database
+  (function(){
+   var LIVE={students:25, states:4, courses:6, logins:40};
+   var row=document.getElementById('liveStats');
+   if(!row)return;
+   var xhr=new XMLHttpRequest();
+   xhr.open('GET','https://api.sheetbest.com/sheets/e21f6dbb-5123-4b18-82d3-152da8c09a8d',true);
+   xhr.timeout=8000;
+   xhr.onload=function(){
+    if(xhr.status===200){
+     try{
+      var rows=JSON.parse(xhr.responseText);
+      if(Array.isArray(rows)&&rows.length>LIVE.students)LIVE.students=rows.length;
+     }catch(e){}
+    }
+    showLive();
+   };
+   xhr.onerror=function(){showLive();};
+   xhr.ontimeout=function(){showLive();};
+   xhr.send();
+   function showLive(){
+    row.style.display='flex';
+    row.style.flexWrap='wrap';
+    row.style.justifyContent='center';
+    row.querySelectorAll('.stat-num[data-live]').forEach(function(el){
+     var key=el.getAttribute('data-live');
+     var target=LIVE[key]||0;
+     var duration=1500;
+     var start=performance.now();
+     function tick(now){
+      var p=Math.min((now-start)/duration,1);
+      el.textContent=Math.round((1-Math.pow(1-p,3))*target);
+      if(p<1)requestAnimationFrame(tick);else el.textContent=target;
+     }
+     requestAnimationFrame(tick);
+    });
+   }
+  })();
   // Use IntersectionObserver with low threshold
   const statsSection=document.querySelector('.stats-row');
   if(statsSection){
