@@ -109,6 +109,13 @@
   /* COUNTER STATS */
   .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin:40px 0;}
   .stat-box{text-align:center;padding:20px 12px;}
+  .lbar-wrap{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;width:clamp(56px,14vw,110px);}
+  .lbar{width:100%;max-width:74px;border-radius:10px 10px 4px 4px;height:0;transition:height 1.6s cubic-bezier(0.22,1,0.36,1);box-shadow:0 6px 18px rgba(0,0,0,0.18);position:relative;}
+  .lbar-wrap:hover .lbar{filter:brightness(1.12);}
+  .lbar-val{font-family:'Josefin Sans',sans-serif;font-weight:700;font-size:clamp(1.1rem,3vw,1.6rem);color:white;margin-bottom:8px;opacity:0;transform:translateY(8px);transition:opacity 0.6s ease,transform 0.6s ease;}
+  .lbar-label{margin-top:10px;font-size:0.78rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.92);}
+  .live-dot{width:9px;height:9px;border-radius:50%;background:#7CFC9E;display:inline-block;animation:pulseDot 1.6s ease-in-out infinite;}
+  @keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(124,252,158,0.7);opacity:1;}50%{box-shadow:0 0 0 7px rgba(124,252,158,0);opacity:0.75;}}
   .stat-num{font-family:'Josefin Sans',sans-serif;font-size:clamp(2rem,5vw,2.8rem);font-weight:700;color:white;line-height:1.1;}
   .stat-label{font-size:0.82rem;font-weight:600;color:rgba(255,255,255,0.75);margin-top:4px;}
 
@@ -705,6 +712,16 @@
  <div class="stat-box"><div class="stat-num" data-live="states">0</div><div class="stat-label">States + Spain</div></div>
  <div class="stat-box"><div class="stat-num" data-live="courses">0</div><div class="stat-label">Live Courses</div></div>
  <div class="stat-box"><div class="stat-num" data-live="logins">0</div><div class="stat-label">Daily Site Logins</div></div>
+ </div>
+ </div>
+ <div class="section-inner" id="liveGraphWrap" style="margin-top:34px;display:none;">
+ <div style="display:flex;align-items:flex-end;justify-content:center;gap:clamp(14px,4vw,44px);height:200px;padding:0 8px;" id="liveBars">
+ <div class="lbar-wrap"><div class="lbar-val" id="bv-students">0</div><div class="lbar" id="bar-students" style="background:linear-gradient(180deg,#7ee2b0,#22ad5c);"></div><div class="lbar-label">Enrolled</div></div>
+ <div class="lbar-wrap"><div class="lbar-val" id="bv-logins">0</div><div class="lbar" id="bar-logins" style="background:linear-gradient(180deg,#9ad9f5,#2a9db5);"></div><div class="lbar-label">Daily Logins</div></div>
+ <div class="lbar-wrap"><div class="lbar-val" id="bv-courses">0</div><div class="lbar" id="bar-courses" style="background:linear-gradient(180deg,#ffe08a,#f5c842);"></div><div class="lbar-label">Courses</div></div>
+ <div class="lbar-wrap"><div class="lbar-val" id="bv-states">0</div><div class="lbar" id="bar-states" style="background:linear-gradient(180deg,#f5a99b,#e8604a);"></div><div class="lbar-label">States</div></div>
+ </div>
+ <div style="text-align:center;margin-top:14px;"><span style="display:inline-flex;align-items:center;gap:7px;font-size:0.78rem;color:rgba(255,255,255,0.85);letter-spacing:1px;"><span class="live-dot"></span>LIVE — UPDATES WITH EVERY SIGNUP</span></div>
  </div>
  </div>
  </section>
@@ -1822,6 +1839,32 @@ function teacherCodeLogin(){
      }
      requestAnimationFrame(tick);
     });
+    animateBars();
+   }
+   function animateBars(){
+    var wrap=document.getElementById('liveGraphWrap');
+    if(!wrap)return;
+    wrap.style.display='block';
+    var maxVal=Math.max(LIVE.students,LIVE.logins,LIVE.courses,LIVE.states,1);
+    var H=170;
+    setTimeout(function(){
+     ['students','logins','courses','states'].forEach(function(k,i){
+      var bar=document.getElementById('bar-'+k);
+      var val=document.getElementById('bv-'+k);
+      if(!bar)return;
+      var h=Math.max(14,Math.round((LIVE[k]/maxVal)*H));
+      bar.style.height=h+'px';
+      setTimeout(function(){
+       var target=LIVE[k];var s=performance.now();
+       val.style.opacity='1';val.style.transform='translateY(0)';
+       (function cnt(now){
+        var p=Math.min((now-s)/1200,1);
+        val.textContent=Math.round((1-Math.pow(1-p,3))*target);
+        if(p<1)requestAnimationFrame(cnt);else val.textContent=target;
+       })(s);
+      },200+i*180);
+     });
+    },150);
    }
   })();
   // Use IntersectionObserver with low threshold
