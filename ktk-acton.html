@@ -700,21 +700,7 @@
  </section>
 
  <section class="section" style="background:var(--blue);padding:48px 24px;">
- <div class="section-inner section-center">
- <div class="stats-row">
- <div class="stat-box"><div class="stat-num" data-target="500">0</div><div class="stat-label">Students Taught</div></div>
- <div class="stat-box"><div class="stat-num" data-target="40">0</div><div class="stat-label">Student Teachers</div></div>
- <div class="stat-box"><div class="stat-num" data-target="15">0</div><div class="stat-label">Courses Offered</div></div>
- <div class="stat-box"><div class="stat-num" data-target="6">0</div><div class="stat-label">Years Running</div></div>
- </div>
- <div class="stats-row" id="liveStats" style="margin-top:28px;display:none;">
- <div class="stat-box"><div class="stat-num" data-live="students">0</div><div class="stat-label">Enrolled This Fall</div></div>
- <div class="stat-box"><div class="stat-num" data-live="states">0</div><div class="stat-label">States + Spain</div></div>
- <div class="stat-box"><div class="stat-num" data-live="courses">0</div><div class="stat-label">Live Courses</div></div>
- <div class="stat-box"><div class="stat-num" data-live="logins">0</div><div class="stat-label">Daily Site Logins</div></div>
- </div>
- </div>
- <div class="section-inner" id="liveGraphWrap" style="margin-top:34px;display:none;">
+ <div class="section-inner" id="liveGraphWrap" style="display:none;">
  <div style="display:flex;align-items:flex-end;justify-content:center;gap:clamp(14px,4vw,44px);height:200px;padding:0 8px;" id="liveBars">
  <div class="lbar-wrap"><div class="lbar-val" id="bv-students">0</div><div class="lbar" id="bar-students" style="background:linear-gradient(180deg,#7ee2b0,#22ad5c);"></div><div class="lbar-label">Enrolled</div></div>
  <div class="lbar-wrap"><div class="lbar-val" id="bv-logins">0</div><div class="lbar" id="bar-logins" style="background:linear-gradient(180deg,#9ad9f5,#2a9db5);"></div><div class="lbar-label">Daily Logins</div></div>
@@ -722,6 +708,13 @@
  <div class="lbar-wrap"><div class="lbar-val" id="bv-states">0</div><div class="lbar" id="bar-states" style="background:linear-gradient(180deg,#f5a99b,#e8604a);"></div><div class="lbar-label">States</div></div>
  </div>
  <div style="text-align:center;margin-top:14px;"><span style="display:inline-flex;align-items:center;gap:7px;font-size:0.78rem;color:rgba(255,255,255,0.85);letter-spacing:1px;"><span class="live-dot"></span>LIVE — UPDATES WITH EVERY SIGNUP</span></div>
+ </div>
+ <div class="section-inner section-center">
+ <div class="stats-row">
+ <div class="stat-box"><div class="stat-num" data-target="500">0</div><div class="stat-label">Students Taught</div></div>
+ <div class="stat-box"><div class="stat-num" data-target="40">0</div><div class="stat-label">Student Teachers</div></div>
+ <div class="stat-box"><div class="stat-num" data-target="15">0</div><div class="stat-label">Courses Offered</div></div>
+ <div class="stat-box"><div class="stat-num" data-target="6">0</div><div class="stat-label">Years Running</div></div>
  </div>
  </div>
  </section>
@@ -1803,11 +1796,11 @@ function teacherCodeLogin(){
   requestAnimationFrame(tick);
   });
   }
-  // LIVE STATS STRIP — pulls real numbers from the signup database
+  // LIVE STATS GRAPH — pulls real numbers from the signup database
   (function(){
    var LIVE={students:25, states:4, courses:6, logins:40};
-   var row=document.getElementById('liveStats');
-   if(!row)return;
+   var wrap=document.getElementById('liveGraphWrap');
+   if(!wrap)return;
    var xhr=new XMLHttpRequest();
    xhr.open('GET','https://api.sheetbest.com/sheets/e21f6dbb-5123-4b18-82d3-152da8c09a8d',true);
    xhr.timeout=8000;
@@ -1824,21 +1817,6 @@ function teacherCodeLogin(){
    xhr.ontimeout=function(){showLive();};
    xhr.send();
    function showLive(){
-    row.style.display='flex';
-    row.style.flexWrap='wrap';
-    row.style.justifyContent='center';
-    row.querySelectorAll('.stat-num[data-live]').forEach(function(el){
-     var key=el.getAttribute('data-live');
-     var target=LIVE[key]||0;
-     var duration=1500;
-     var start=performance.now();
-     function tick(now){
-      var p=Math.min((now-start)/duration,1);
-      el.textContent=Math.round((1-Math.pow(1-p,3))*target);
-      if(p<1)requestAnimationFrame(tick);else el.textContent=target;
-     }
-     requestAnimationFrame(tick);
-    });
     animateBars();
    }
    function animateBars(){
