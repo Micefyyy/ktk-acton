@@ -36,6 +36,29 @@ const zoomConfigured = Boolean(
   ZOOM_CONFIG.accountId && ZOOM_CONFIG.clientId && ZOOM_CONFIG.clientSecret
 );
 
+// Teacher/admin logins — set KTK_LOGINS in the Render dashboard as a JSON
+// object mapping code -> { name, email, password, courses }. Credentials are
+// never stored in the website source; the browser only sends what the user
+// types to this endpoint for checking.
+let LOGINS = null;
+try {
+  LOGINS = process.env.KTK_LOGINS ? JSON.parse(process.env.KTK_LOGINS) : null;
+} catch (e) {
+  console.error('KTK_LOGINS env var is not valid JSON — logins disabled');
+}
+
+// Login attempts are limited to 10 per IP per 15 minutes.
+const LOGIN_RATE_LIMIT = 10;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
+const loginHits = new Map();
+function loginLimited(ip) {
+  const now = Date.now();
+  const recent = (loginHits.get(ip) || []).filter(function (t) { return now - t < LOGIN_WINDOW_MS; });
+  recent.push(now);
+  loginHits.set(ip, recent);
+  return recent.length > LOGIN_RATE_LIMIT;
+}
+
 // Basic per-IP rate limit on meeting creation (20 per hour) so the endpoint
 // can't be hammered by strangers now that it's on the public internet.
 const RATE_LIMIT = 20;
@@ -84,6 +107,34 @@ async function getAccessToken() {
 
   return accessToken;
 }
+
+// Login check for the teacher dashboard (codes + passwords live only here)
+app.post('/api/login', function (req, res) {
+  try {
+    if (loginLimited(req.ip)) {
+      return res.status(429).json({ success: false, error: 'Too many attempts — try again in a few minutes.' });
+    }
+    if (!LOGINS) {
+      return res.status(500).json({ success: false, error: 'Logins are not configured on the server.' });
+    }
+    const { code, password } = req.body || {};
+    const key = String(code || '').trim().toUpperCase();
+    const rec = LOGINS[key];
+    if (!rec || rec.password !== password) {
+      return res.status(401).json({ success: false, error: 'Invalid code or password. Please try again.' });
+    }
+    res.json({
+      success: true,
+      code: key,
+      name: rec.name,
+      email: rec.email,
+      courses: rec.courses || []
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, error: 'Login failed.' });
+  }
+});
 
 // Health checks (Render uses /api/health)
 app.get('/', function (req, res) {

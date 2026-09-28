@@ -1205,16 +1205,15 @@
  });
  const db = firebase.firestore();
  const auth = firebase.auth();
- const TEACHER_SECRET = 'KTK2026';
- // Teacher codes — each code links a teacher to their courses
+ // Teacher directory — public info only. Passwords are NOT stored here; they
+ // are verified server-side by the KTK Zoom server (zoom-server/ on Render).
  const teacherCodes = {
-  'SJ2026': { name: 'Saina Joshi', email: 'saina@ktkacton.com', password: 'Sa!Jn-KTK26', courses: ['Beginner AMC 8 Prep'] },
-  'MG2026': { name: 'Max Geng', email: 'max@ktkacton.com', password: 'Mx#Gng-26!', courses: ['Math Fundamentals'] },
-  'AN2026': { name: 'Ayan Nayak', email: 'ayan@ktkacton.com', password: 'Ayan', courses: ['Geometry'] },
-  'ARYA26': { name: 'Arya Nayak', email: 'arya@ktkacton.com', password: 'Ar!Nyk-26&', courses: ['Pre-Algebra'] },
-  'JA2026': { name: 'Josephine Abakah', email: 'josie@ktkacton.com', password: 'Js@Abk-KT26', courses: ['Spanish Fundamentals'] },
-  'AA2026': { name: 'Anjaneya Aggarwal', email: 'anjaneya@ktkacton.com', password: 'Anj@Agg-KT26', courses: ['Entrepreneurship 101'] },
-  'ADMIN': { name: 'Admin (Test)', email: 'admin@ktkacton.com', password: '2672319667', courses: ['Beginner AMC 8 Prep', 'Math Fundamentals', 'Geometry', 'Pre-Algebra', 'Spanish Fundamentals', 'Entrepreneurship 101'] }
+  'SJ2026': { name: 'Saina Joshi', email: 'saina@ktkacton.com', courses: ['Beginner AMC 8 Prep'] },
+  'MG2026': { name: 'Max Geng', email: 'max@ktkacton.com', courses: ['Math Fundamentals'] },
+  'AN2026': { name: 'Ayan Nayak', email: 'ayan@ktkacton.com', courses: ['Geometry'] },
+  'ARYA26': { name: 'Arya Nayak', email: 'arya@ktkacton.com', courses: ['Pre-Algebra'] },
+  'JA2026': { name: 'Josephine Abakah', email: 'josie@ktkacton.com', courses: ['Spanish Fundamentals'] },
+  'AA2026': { name: 'Anjaneya Aggarwal', email: 'anjaneya@ktkacton.com', courses: ['Entrepreneurship 101'] }
 };
  const teacherZoomLinks = {
   'Beginner AMC 8 Prep': 'https://us06web.zoom.us/meeting/register/P43h2XhhSW6dQ0cdTMZSuQ',
@@ -1264,8 +1263,40 @@
   info.style.display = 'block';
  }
 
- // ===== TEACHER CODE LOGIN =====
- var currentTeacher = null;
+ // ===== TEACHER CODE LOGIN (verified server-side) =====
+ function zoomApiBase(){
+  const local = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  return window.KTK_ZOOM_API_URL || (local ? 'http://localhost:3001' : 'https://ktk-zoom-server.onrender.com');
+ }
+ async function teacherCodeLogin(){
+  const name = document.getElementById('tl-name').value.trim();
+  const code = document.getElementById('tl-code').value.trim().toUpperCase();
+  const pass = document.getElementById('tl-pass').value;
+  const err = document.getElementById('tl-error');
+  const btn = document.querySelector('#tl-login .btn-sub');
+  err.style.display = 'none';
+  if(!name || !code || !pass){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+  if(btn){ btn.disabled = true; btn.textContent = 'Checking...'; }
+  try {
+   const response = await fetch(zoomApiBase() + '/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: code, password: pass })
+   });
+   const data = await response.json();
+   if(!data.success){ throw new Error(data.error || 'Invalid code or password. Please try again.'); }
+   currentTeacher = { name: name, code: data.code, email: data.email, courses: (data.courses && data.courses.length ? data.courses : ((teacherCodes[data.code]||{}).courses||[])) };
+   document.getElementById('tl-login').style.display='none';
+   document.getElementById('tl-dashboard').style.display='block';
+   document.getElementById('tl-welcome').textContent='Welcome, ' + name + '!';
+   renderTeacherDashboard();
+  } catch(e){
+   err.textContent = (e.message === 'Failed to fetch') ? 'Could not reach the login server. If it was asleep, wait a few seconds and try again.' : e.message;
+   err.style.display='block';
+  } finally {
+   if(btn){ btn.disabled = false; btn.textContent = 'Log In'; }
+  }
+ }
    // ===== STUDENT SIGNUP =====
  // REPLACE THIS URL with your Google Apps Script web app URL after deploying
  // EmailJS + Sheet.best
@@ -1313,22 +1344,6 @@
   });
  }
 
-function teacherCodeLogin(){
-  const name = document.getElementById('tl-name').value.trim();
-  const code = document.getElementById('tl-code').value.trim().toUpperCase();
-  const pass = document.getElementById('tl-pass').value;
-  const err = document.getElementById('tl-error');
-  err.style.display = 'none';
-  if(!name || !code){err.textContent='Please fill in all fields.';err.style.display='block';return;}
-  const teacher = teacherCodes[code];
-  if(!teacher){err.textContent='Invalid teacher code. Please check and try again.';err.style.display='block';return;}
-  if(pass !== teacher.password){err.textContent='Incorrect password. Please try again.';err.style.display='block';return;}
-  currentTeacher = { name: name, code: code, courses: teacher.courses };
-  document.getElementById('tl-login').style.display='none';
-  document.getElementById('tl-dashboard').style.display='block';
-  document.getElementById('tl-welcome').textContent='Welcome, ' + name + '!';
-  renderTeacherDashboard();
- }
  function renderTeacherDashboard(){
   const container = document.getElementById('tl-courses-list');
   container.innerHTML = '';
@@ -1443,18 +1458,14 @@ function teacherCodeLogin(){
 
   try {
    const details = teacherCourseDetails[courseName] || {};
-   const teacher = teacherCodes[currentTeacher.code];
-
-   // Zoom meeting API: hosted on Render in production, local .freebuff/zoom-server.js in dev
-   const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-   const zoomApiBase = window.KTK_ZOOM_API_URL || (isLocalDev ? 'http://localhost:3001' : 'https://ktk-zoom-server.onrender.com');
-   const response = await fetch(zoomApiBase + '/api/create-meeting', {
+   const teacherEmail = currentTeacher.email || (teacherCodes[currentTeacher.code]||{}).email || '';
+   const response = await fetch(zoomApiBase() + '/api/create-meeting', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
      courseId: currentTeacher.code,
      courseName: courseName,
-     teacherEmail: teacher.email,
+     teacherEmail: teacherEmail,
      duration: 60,
      timezone: 'America/New_York'
     })
