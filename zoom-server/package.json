@@ -1,0 +1,17 @@
+{
+  "name": "ktk-zoom-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Creates Zoom meetings on demand for the KTK teacher dashboard",
+  "main": "server.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

@@ -1444,7 +1444,10 @@ function teacherCodeLogin(){
    const details = teacherCourseDetails[courseName] || {};
    const teacher = teacherCodes[currentTeacher.code];
 
-   const response = await fetch('http://localhost:3001/api/create-meeting', {
+   // Zoom meeting API: hosted on Render in production, local .freebuff/zoom-server.js in dev
+   const isLocalDev = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+   const zoomApiBase = window.KTK_ZOOM_API_URL || (isLocalDev ? 'http://localhost:3001' : 'https://ktk-zoom-server.onrender.com');
+   const response = await fetch(zoomApiBase + '/api/create-meeting', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

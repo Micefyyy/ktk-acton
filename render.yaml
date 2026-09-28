@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: ktk-zoom-server
+    runtime: node
+    plan: free
+    rootDir: zoom-server
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: ZOOM_ACCOUNT_ID
+        sync: false
+      - key: ZOOM_CLIENT_ID
+        sync: false
+      - key: ZOOM_CLIENT_SECRET
+        sync: false
