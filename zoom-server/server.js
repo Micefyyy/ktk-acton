@@ -13,6 +13,9 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
+// Behind Render's proxy — needed so req.ip is the real visitor, otherwise the
+// per-IP rate limits would count all visitors as one.
+app.set('trust proxy', true);
 app.use(express.json());
 
 // Only the real site (and local dev) may call this from a browser.
