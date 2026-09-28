@@ -1109,7 +1109,7 @@
 
  <!-- Login Form -->
  <div class="su-card gradient-border gradient-border-blue" id="tl-login">
- <div class="fg"><label>Your Name</label><input type="text" id="tl-name" placeholder="First and last name"/></div>   <div class="fg"><label>Teacher Code</label><input type="text" id="tl-code" placeholder="e.g. AA2026 or ADMIN" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/></div>
+ <div class="fg"><label>Your Name</label><input type="text" id="tl-name" placeholder="First and last name"/></div>   <div class="fg"><label>Teacher Code</label><input type="text" id="tl-code" placeholder="e.g. AA2026" style="text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()"/></div>
  <div class="fg"><label>Password</label><input type="password" id="tl-pass" placeholder="Your password"/></div>
  <button class="btn-sub" onclick="teacherCodeLogin()">Log In</button>
  <div id="tl-error" style="display:none;color:#c0392b;font-size:0.85rem;text-align:center;margin-top:10px;"></div>
@@ -1214,7 +1214,6 @@
   'ARYA26': { name: 'Arya Nayak', email: 'arya@ktkacton.com', password: 'Ar!Nyk-26&', courses: ['Pre-Algebra'] },
   'JA2026': { name: 'Josephine Abakah', email: 'josie@ktkacton.com', password: 'Js@Abk-KT26', courses: ['Spanish Fundamentals'] },
   'AA2026': { name: 'Anjaneya Aggarwal', email: 'anjaneya@ktkacton.com', password: 'Anj@Agg-KT26', courses: ['Entrepreneurship 101'] },
-  // Test admin login (for demo/testing only — remove before production use)
   'ADMIN': { name: 'Admin (Test)', email: 'admin@ktkacton.com', password: '2672319667', courses: ['Beginner AMC 8 Prep', 'Math Fundamentals', 'Geometry', 'Pre-Algebra', 'Spanish Fundamentals', 'Entrepreneurship 101'] }
 };
  const teacherZoomLinks = {
@@ -1315,13 +1314,11 @@
  }
 
 function teacherCodeLogin(){
-  let name = document.getElementById('tl-name').value.trim();
+  const name = document.getElementById('tl-name').value.trim();
   const code = document.getElementById('tl-code').value.trim().toUpperCase();
   const pass = document.getElementById('tl-pass').value;
   const err = document.getElementById('tl-error');
   err.style.display = 'none';
-  // Test admin login: name is optional and forced to 'Admin'
-  if(code === 'ADMIN'){ name = name || 'Admin'; }
   if(!name || !code){err.textContent='Please fill in all fields.';err.style.display='block';return;}
   const teacher = teacherCodes[code];
   if(!teacher){err.textContent='Invalid teacher code. Please check and try again.';err.style.display='block';return;}
