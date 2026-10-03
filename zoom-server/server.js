@@ -200,10 +200,25 @@ app.post('/api/create-meeting', async (req, res) => {
 
     const meeting = await response.json();
 
+    // Host key lets a teacher who is signed into their OWN Zoom account claim
+    // host after joining via the student link (fallback if start_url misbehaves).
+    let hostKey = null;
+    try {
+      const meRes = await fetch(`${ZOOM_CONFIG.baseUrl}/users/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (meRes.ok) {
+        const me = await meRes.json();
+        if (me.host_key) hostKey = me.host_key;
+      }
+    } catch (_) { /* host key is optional */ }
+
     res.json({
       success: true,
       meetingId: meeting.id,
       joinUrl: meeting.join_url,
+      hostUrl: meeting.start_url,
+      hostKey: hostKey,
       hostEmail: teacherEmail || null,
       topic: meeting.topic,
       password: meeting.password

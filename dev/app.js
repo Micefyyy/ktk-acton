@@ -374,11 +374,11 @@ async function startClass(courseName) {
       meetingInfo.appendChild(p2);
 
       var joinBtn = document.createElement('a');
-      joinBtn.href = data.joinUrl;
+      joinBtn.href = data.hostUrl || data.joinUrl;
       joinBtn.target = '_blank';
       joinBtn.className = 'btn-green';
       joinBtn.style.cssText = 'display:inline-block;padding:8px 16px;font-size:0.9rem;';
-      joinBtn.textContent = 'Join as Host';
+      joinBtn.textContent = 'Start Meeting (Host)';
       meetingInfo.appendChild(joinBtn);
 
       var copyBtn = document.createElement('button');
@@ -393,6 +393,13 @@ async function startClass(courseName) {
         });
       });
       meetingInfo.appendChild(copyBtn);
+
+      if (data.hostKey) {
+        var hk = document.createElement('p');
+        hk.style.cssText = 'font-size:0.75rem;color:var(--lighter);margin-top:8px;';
+        hk.textContent = 'Claim Host key (use if Zoom asks for host approval): ' + data.hostKey;
+        meetingInfo.appendChild(hk);
+      }
 
       meta.parentNode.insertBefore(meetingInfo, meta.nextSibling);
       teacherZoomLinks[courseName] = data.joinUrl;
